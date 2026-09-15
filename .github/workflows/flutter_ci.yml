@@ -1,0 +1,60 @@
+name: FIXIS Flutter CI
+
+on:
+  push:
+    branches:
+      - develop
+      - 'feature/**'
+      - 'hotfix/**'
+
+  pull_request:
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: flutter-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter-quality:
+    name: Flutter Quality Gate
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.3'
+          channel: stable
+          cache: true
+
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze source code
+        run: flutter analyze
+
+      - name: Detect automated tests
+        id: tests
+        shell: bash
+        run: |
+          if find test -type f -name '*_test.dart' 2>/dev/null | grep -q .; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Automated tests found."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::No automated Flutter tests found."
+          fi
+
+      - name: Run automated tests
+        if: steps.tests.outputs.exists == 'true'
+        run: flutter test
