@@ -1,0 +1,24 @@
+{
+  "version": "v1.10.7.4",
+  "base": "v1.10.7.3",
+  "sql_required": false,
+  "backend_changed": false,
+  "business_logic_changed": false,
+  "scope": "Customer header alignment with professional premium pattern",
+  "changed_files": [
+    "lib/features/customer/screens/customer_home_screen.dart"
+  ],
+  "preserved": [
+    "customer profile",
+    "customer avatar",
+    "account deletion",
+    "jobs",
+    "payments",
+    "tracking",
+    "FIXIS Live"
+  ],
+  "ui_changes": [
+    "header avatar opens profile",
+    "remove redundant profile card"
+  ]
+}

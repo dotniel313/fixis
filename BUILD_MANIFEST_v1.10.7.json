@@ -1,0 +1,24 @@
+{
+  "version": "v1.10.7",
+  "base": "v1.10.6",
+  "sql_required": false,
+  "backend_changed": false,
+  "business_logic_changed": false,
+  "scope": "Customer Profile Premium",
+  "new_files": [
+    "lib/features/customer/screens/customer_profile_screen.dart"
+  ],
+  "changed_files": [
+    "lib/features/customer/screens/customer_home_screen.dart"
+  ],
+  "preserved": [
+    "profiles",
+    "userProfileProvider",
+    "myCustomerJobsProvider",
+    "jobs flow",
+    "payments",
+    "tracking",
+    "FIXIS Live"
+  ],
+  "next": "Android physical QA + FIXIS PRO v2.0 RC1"
+}

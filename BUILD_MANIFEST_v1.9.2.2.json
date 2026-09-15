@@ -1,0 +1,11 @@
+{
+  "version": "v1.9.2.2",
+  "base": "v1.9.2.1",
+  "migration": "023",
+  "changes": [
+    "settlements.professional_name snapshot",
+    "backfill existing settlements",
+    "trigger for future settlements",
+    "admin UI shows professional name instead of UUID"
+  ]
+}

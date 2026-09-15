@@ -1,0 +1,13 @@
+{
+  "version": "v1.9.3.2",
+  "base": "v1.9.3.1",
+  "sql_required": false,
+  "issue": "JOB-STATE-001",
+  "decision": "customer_approved remains terminal historical state",
+  "changes": [
+    "remove customer_approved from professional active jobs",
+    "split customer jobs into active and history sections",
+    "preserve historical detail access",
+    "no finance/payment/wallet/notification changes"
+  ]
+}

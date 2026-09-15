@@ -1,0 +1,18 @@
+{
+  "version": "v1.10.7.1",
+  "base": "v1.10.7",
+  "sql_required": false,
+  "backend_changed": false,
+  "business_logic_changed": false,
+  "scope": "Customer Avatar Hotfix",
+  "changed_files": [
+    "lib/features/customer/screens/customer_profile_screen.dart"
+  ],
+  "reused": [
+    "profiles.avatar_url",
+    "avatars_pro",
+    "image_picker",
+    "userProfileProvider"
+  ],
+  "next": "Android physical QA + FIXIS PRO v2.0 RC1"
+}

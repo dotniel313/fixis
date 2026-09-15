@@ -1,0 +1,14 @@
+{
+  "version": "v1.9.3.0.1",
+  "base": "v1.9.3.0",
+  "sql_required": false,
+  "scope": "auth resilience",
+  "incident": "AUTH-002",
+  "changes": [
+    "friendly 504 upstream timeout handling",
+    "60-second cooldown begins before sendOtp response",
+    "parallel OTP request guard",
+    "no immediate resend after timeout",
+    "no wallet or financial changes"
+  ]
+}

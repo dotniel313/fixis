@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Fixis Pro</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>fixis_pro</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<!-- INICIO PERMISOS GPS FIXIS PRO -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Fixis PRO necesita tu ubicación para enviarte solicitudes de clientes cercanos a ti cuando estás disponible.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Fixis PRO necesita tu ubicación en segundo plano para mantenerte conectado con clientes de tu zona.</string>
+    <!-- FIN PERMISOS GPS -->
+    
+    <!-- INICIO PERMISOS CÁMARA Y FOTOS (UNIFICADO) -->
+    <key>NSCameraUsageDescription</key>
+    <string>Fixis PRO necesita acceder a tu cámara para que puedas actualizar tu foto de perfil y tomar la evidencia fotográfica (Antes y Después) obligatoria de tus trabajos.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Fixis PRO necesita acceder a tus fotos para que puedas subir una foto de perfil o evidencia guardada en tu galería.</string>
+    <!-- FIN PERMISOS CÁMARA Y FOTOS -->
+</dict>
+</plist>
+</dict>
+</plist>

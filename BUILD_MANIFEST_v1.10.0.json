@@ -1,0 +1,17 @@
+{
+  "version": "v1.10.0",
+  "base": "v1.9.3.2",
+  "sql_required": false,
+  "scope": "premium design system and FIXIS identity",
+  "business_logic_changed": false,
+  "backend_changed": false,
+  "new_files": [
+    "lib/core/widgets/fixis_ui.dart"
+  ],
+  "changed_files": [
+    "lib/core/theme/theme.dart",
+    "lib/features/dashboard/screens/dashboard_screen.dart",
+    "lib/main.dart"
+  ],
+  "next": "v1.10.1 Map-first Professional Home"
+}

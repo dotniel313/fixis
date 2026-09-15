@@ -1,0 +1,15 @@
+{
+  "version": "v1.9.3.1",
+  "base": "v1.9.3.0.1",
+  "migration": "027",
+  "scope": "real settlement notifications",
+  "features": [
+    "real notifications table with RLS",
+    "settlement event trigger",
+    "idempotent historical backfill",
+    "realtime notifications stream",
+    "professional notification center",
+    "unread badge in professional dashboard",
+    "mark one/all as read"
+  ]
+}

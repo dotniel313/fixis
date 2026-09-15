@@ -1,0 +1,12 @@
+{
+  "version": "v1.9.2.3",
+  "base": "v1.9.2.2",
+  "migration": "024",
+  "scope": "settlement audit and traceability",
+  "checks": [
+    "settlement_items sum equals requested amount",
+    "exactly one settlement_debit for paid settlements",
+    "settlement_debit amount equals requested amount",
+    "bank payout reference visible in Admin"
+  ]
+}

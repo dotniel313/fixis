@@ -1,0 +1,23 @@
+{
+  "version": "v1.10.2",
+  "base": "v1.10.1",
+  "sql_required": false,
+  "backend_changed": false,
+  "business_logic_changed": false,
+  "scope": "Wallet + Notifications Premium",
+  "changed_files": [
+    "lib/features/wallet/screens/wallet_screen.dart",
+    "lib/features/notifications/screens/notifications_screen.dart"
+  ],
+  "preserved": [
+    "walletV2Provider",
+    "get_wallet_summary",
+    "get_professional_payout_schedule",
+    "myNotificationsStreamProvider",
+    "markAsRead",
+    "markAllAsRead",
+    "financial ledger",
+    "settlements"
+  ],
+  "next": "v1.10.3 Profile + Nivel FIXIS Premium"
+}

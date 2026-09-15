@@ -1,0 +1,11 @@
+{
+  "version": "v1.9.1.4",
+  "migration": "021",
+  "flutter_changes": false,
+  "sql_changes": true,
+  "fix": "Composite return handling in admin payment wrapper RPCs",
+  "affected_functions": [
+    "admin_verify_bank_transfer(uuid,numeric,text,text,text)",
+    "admin_reject_bank_transfer(uuid,text,text)"
+  ]
+}

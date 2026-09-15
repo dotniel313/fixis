@@ -1,0 +1,17 @@
+{
+  "version": "v1.10.7.3",
+  "base": "v1.10.7.2",
+  "sql_required": false,
+  "backend_changed": false,
+  "business_logic_changed": false,
+  "scope": "Customer account deletion compliance",
+  "changed_files": [
+    "lib/features/customer/screens/customer_profile_screen.dart"
+  ],
+  "reused_rpc": "delete_user_account",
+  "store_compliance": {
+    "apple_in_app_deletion_path": true,
+    "google_in_app_deletion_path": true,
+    "google_external_web_deletion_resource": "still required before Play submission"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "version": "v1.10.7.2",
+  "base": "v1.10.7.1",
+  "sql_required": false,
+  "backend_changed": false,
+  "business_logic_changed": false,
+  "issue": "Customer profile screen/access not visible in physical iPhone test",
+  "fix": [
+    "Visible labeled Mi perfil button in customer hero",
+    "Second visible Mi perfil shortcut card below hero",
+    "CustomerProfileScreen retained",
+    "Customer avatar camera/gallery retained"
+  ],
+  "changed_files": [
+    "lib/features/customer/screens/customer_home_screen.dart"
+  ],
+  "verified_files": [
+    "lib/features/customer/screens/customer_profile_screen.dart"
+  ]
+}

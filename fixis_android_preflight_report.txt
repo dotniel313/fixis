@@ -1,0 +1,240 @@
+
+============================================================
+FIXIS ANDROID PREFLIGHT
+============================================================
+Fecha: Sun Sep 13 16:48:04 -03 2026
+Directorio: /Users/danielorellana/fixis_pro
+
+============================================================
+FLUTTER / DART
+============================================================
+Flutter 3.35.3 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision a402d9a437 (1 year ago) • 2025-09-03 14:54:31 -0700
+Engine • hash 672c59cfa87c8070c20ba2cd1a6c2a1baf5cf08b (revision ddf47dd3ff) (12 months ago) • 2025-09-03 20:02:13.000Z
+Tools • Dart 3.9.2 • DevTools 2.48.0
+Dart SDK version: 3.9.2 (stable) (Wed Aug 27 03:49:40 2025 -0700) on "macos_arm64"
+[✓] Flutter (Channel stable, 3.35.3, on macOS 26.6.2 25G83 darwin-arm64, locale es-EC) [624ms]
+    • Flutter version 3.35.3 on channel stable at /Users/danielorellana/flutter
+    • Upstream repository https://github.com/flutter/flutter.git
+    • Framework revision a402d9a437 (1 year ago), 2025-09-03 14:54:31 -0700
+    • Engine revision ddf47dd3ff
+    • Dart version 3.9.2
+    • DevTools version 2.48.0
+    • Feature flags: enable-web, enable-linux-desktop, no-enable-macos-desktop, enable-windows-desktop, enable-android, enable-ios, cli-animations, no-enable-lldb-debugging
+
+[✓] Android toolchain - develop for Android devices (Android SDK version 36.0.0) [2,1s]
+    • Android SDK at /Users/danielorellana/Library/Android/sdk
+    • Emulator version 36.1.9.0 (build_id 13823996) (CL:N/A)
+    • Platform android-36, build-tools 36.0.0
+    • ANDROID_HOME = /Users/danielorellana/Library/Android/sdk
+    • Java binary at: /Applications/Android Studio.app/Contents/jbr/Contents/Home/bin/java
+      This is the JDK bundled with the latest Android Studio installation on this machine.
+      To manually set the JDK path, use: `flutter config --jdk-dir="path/to/jdk"`.
+    • Java version OpenJDK Runtime Environment (build 21.0.6+-13391695-b895.109)
+    • All Android licenses accepted.
+
+[✓] Xcode - develop for iOS and macOS (Xcode 26.6) [1.465ms]
+    • Xcode at /Applications/Xcode.app/Contents/Developer
+    • Build 17F113
+    • CocoaPods version 1.16.2
+
+[✓] Chrome - develop for the web [7ms]
+    • Chrome at /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
+
+[✓] Android Studio (version 2025.1) [6ms]
+    • Android Studio at /Applications/Android Studio.app/Contents
+    • Flutter plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/9212-flutter
+    • Dart plugin can be installed from:
+      🔨 https://plugins.jetbrains.com/plugin/6351-dart
+    • Java version OpenJDK Runtime Environment (build 21.0.6+-13391695-b895.109)
+
+[✓] VS Code (version 1.137.0) [5ms]
+    • VS Code at /Applications/Visual Studio Code.app/Contents
+    • Flutter extension version 3.142.0
+
+[✓] Connected device (2 available) [7,2s]
+    • iPhone de Daniel  (wireless) (mobile) • 00008120-000E29601401A01E • ios            • iOS 26.6 23G5028e
+    • Chrome (web)                          • chrome                    • web-javascript • Google Chrome 151.0.7922.176
+    ! Error: Browsing on the local area network for iPhone CHQ. Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.
+      The device must be opted into Developer Mode to connect wirelessly. (code -27)
+    ! Error: Browsing on the local area network for iPhone de Misho. Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.
+      The device must be opted into Developer Mode to connect wirelessly. (code -27)
+    ! Error: Browsing on the local area network for iPhone de Maria jose. Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.
+      The device must be opted into Developer Mode to connect wirelessly. (code -27)
+    ! Error: Browsing on the local area network for iPhone de Cristian. Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.
+      The device must be opted into Developer Mode to connect wirelessly. (code -27)
+    ! Error: Browsing on the local area network for Apple Watch de Daniel. Ensure the device is unlocked and discoverable via Bluetooth. (code -27)
+
+[✓] Network resources [304ms]
+    • All expected network resources are available.
+
+• No issues found!
+
+============================================================
+PROYECTO
+============================================================
+name: fixis_pro
+version: 1.0.0+1
+
+============================================================
+DEPENDENCIAS RELEVANTES
+============================================================
+  supabase_flutter: ^2.5.4
+  image_picker: ^1.2.2
+  drift: ^2.19.1
+  sqlite3_flutter_libs: ^0.5.23
+  geolocator: ^11.0.0
+  url_launcher: ^6.2.6
+  flutter_map: ^8.3.2
+  drift_dev: ^2.19.1
+
+============================================================
+ANDROID FILES
+============================================================
+FOUND: android/app/src/main/AndroidManifest.xml
+MISSING/NOT USED: android/app/build.gradle
+FOUND: android/app/build.gradle.kts
+MISSING/NOT USED: android/build.gradle
+FOUND: android/build.gradle.kts
+FOUND: android/gradle.properties
+MISSING/NOT USED: android/settings.gradle
+FOUND: android/settings.gradle.kts
+
+============================================================
+ANDROID MANIFEST — PERMISSIONS / DEEP LINKS
+============================================================
+3:    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+4:    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+8:        android:name="${applicationName}"
+11:            android:name=".MainActivity"
+24:              android:name="io.flutter.embedding.android.NormalTheme"
+27:            <intent-filter>
+28:                <action android:name="android.intent.action.MAIN"/>
+29:                <category android:name="android.intent.category.LAUNCHER"/>
+30:            </intent-filter>
+35:            android:name="flutterEmbedding"
+45:            <action android:name="android.intent.action.PROCESS_TEXT"/>
+
+============================================================
+ANDROID SDK / APPLICATION ID
+============================================================
+--- android/app/build.gradle.kts ---
+9:    namespace = "ec.com.geotactics.fixis_pro"
+10:    compileSdk = flutter.compileSdkVersion
+24:        applicationId = "ec.com.geotactics.fixis_pro"
+27:        minSdk = flutter.minSdkVersion
+28:        targetSdk = flutter.targetSdkVersion
+29:        versionCode = flutter.versionCode
+30:        versionName = flutter.versionName
+37:            signingConfig = signingConfigs.getByName("debug")
+
+============================================================
+LOCAL PROPERTIES
+============================================================
+sdk.dir=<configured>
+flutter.sdk=<configured>
+
+============================================================
+PERMISOS ESPERADOS POR FIXIS
+============================================================
+Revisar según funciones usadas:
+- android.permission.INTERNET
+- android.permission.ACCESS_FINE_LOCATION
+- android.permission.ACCESS_COARSE_LOCATION
+- CAMERA (si el flujo/captura lo requiere explícitamente)
+- permisos de imágenes modernos si alguna librería los necesita
+Nota: image_picker moderno suele delegar selección al sistema; no agregar permisos antiguos de almacenamiento sin necesidad.
+
+============================================================
+DISPOSITIVOS
+============================================================
+Found 1 connected device:
+  Chrome (web) • chrome • web-javascript • Google Chrome 151.0.7922.176
+
+Checking for wireless devices...
+
+Found 1 wirelessly connected device:
+  iPhone de Daniel  (wireless) (mobile) • 00008120-000E29601401A01E • ios • iOS 26.6 23G5028e
+
+Error: Browsing on the local area network for iPhone CHQ. Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.
+The device must be opted into Developer Mode to connect wirelessly. (code -27)
+
+Error: Browsing on the local area network for iPhone de Misho. Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.
+The device must be opted into Developer Mode to connect wirelessly. (code -27)
+
+Error: Browsing on the local area network for iPhone de Maria jose. Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.
+The device must be opted into Developer Mode to connect wirelessly. (code -27)
+
+Error: Browsing on the local area network for iPhone de Cristian. Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.
+The device must be opted into Developer Mode to connect wirelessly. (code -27)
+
+Error: Browsing on the local area network for Apple Watch de Daniel. Ensure the device is unlocked and discoverable via Bluetooth. (code -27)
+
+Run "flutter emulators" to list and start any available device emulators.
+
+If you expected another device to be detected, please run "flutter doctor" to diagnose potential issues. You may also try increasing the time to wait for connected devices with the "--device-timeout" flag. Visit https://flutter.dev/setup/ for troubleshooting tips.
+List of devices attached
+
+
+============================================================
+ANALYZE
+============================================================
+Analyzing fixis_pro...                                          
+
+warning • The declaration '_logout' isn't referenced • lib/features/admin/screens/admin_payments_screen.dart:78:16 • unused_element
+   info • The type of the right operand ('int') isn't a subtype or a supertype of the left operand ('String?') • lib/features/auth/providers/auth_repository.dart:177:26 • unrelated_type_equality_checks
+warning • The value of 'refresh' should be used • lib/features/auth/screens/auth_gate_screen.dart:26:21 • unused_result
+warning • The value of 'refresh' should be used • lib/features/auth/screens/auth_gate_screen.dart:45:27 • unused_result
+   info • Use 'const' with the constructor to improve performance • lib/features/customer/screens/customer_home_screen.dart:70:34 • prefer_const_constructors
+   info • Use 'const' literals as arguments to constructors of '@immutable' classes • lib/features/customer/screens/customer_profile_screen.dart:41:18 • prefer_const_literals_to_create_immutables
+   info • Use 'const' with the constructor to improve performance • lib/features/customer/screens/customer_profile_screen.dart:42:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/customer/screens/customer_profile_screen.dart:44:20 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/customer/screens/customer_profile_screen.dart:45:22 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/dashboard/screens/dashboard_screen.dart:727:25 • prefer_const_constructors
+   info • Use 'const' literals as arguments to constructors of '@immutable' classes • lib/features/gamification/screens/gamification_screen.dart:34:18 • prefer_const_literals_to_create_immutables
+   info • Use 'const' with the constructor to improve performance • lib/features/gamification/screens/gamification_screen.dart:35:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/gamification/screens/gamification_screen.dart:37:20 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/gamification/screens/gamification_screen.dart:38:22 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/notifications/screens/notifications_screen.dart:157:11 • prefer_const_constructors
+   info • Use 'const' literals as arguments to constructors of '@immutable' classes • lib/features/profile/screens/profile_screen.dart:101:18 • prefer_const_literals_to_create_immutables
+   info • Use 'const' with the constructor to improve performance • lib/features/profile/screens/profile_screen.dart:102:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/profile/screens/profile_screen.dart:104:20 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/profile/screens/profile_screen.dart:105:22 • prefer_const_constructors
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check • lib/features/profile/screens/profile_screen.dart:855:50 • use_build_context_synchronously
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check • lib/features/profile/screens/profile_screen.dart:865:50 • use_build_context_synchronously
+   info • Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check • lib/features/profile/screens/profile_screen.dart:960:50 • use_build_context_synchronously
+   info • Use 'const' literals as arguments to constructors of '@immutable' classes • lib/features/wallet/screens/wallet_screen.dart:163:18 • prefer_const_literals_to_create_immutables
+   info • Use 'const' with the constructor to improve performance • lib/features/wallet/screens/wallet_screen.dart:164:11 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/wallet/screens/wallet_screen.dart:166:20 • prefer_const_constructors
+   info • Use 'const' with the constructor to improve performance • lib/features/wallet/screens/wallet_screen.dart:167:22 • prefer_const_constructors
+
+26 issues found. (ran in 2.3s)
+flutter analyze exit code: 1
+
+============================================================
+DEBUG APK BUILD
+============================================================
+Running Gradle task 'assembleDebug'...                          
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+Running Gradle task 'assembleDebug'...                            152,5s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+flutter build apk --debug exit code: 0
+
+============================================================
+APPBUNDLE RELEASE DRY CHECK
+============================================================
+No se ejecuta build release firmado automáticamente para no tocar signing.
+Cuando signing esté confirmado, usar: flutter build appbundle --release
+
+============================================================
+RESUMEN
+============================================================
+ANALYZE: REVISAR
+DEBUG APK: OK
+APK: build/app/outputs/flutter-apk/app-debug.apk
+
+Reporte generado: fixis_android_preflight_report.txt

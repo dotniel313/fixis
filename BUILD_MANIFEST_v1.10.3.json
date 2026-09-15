@@ -1,0 +1,21 @@
+{
+  "version": "v1.10.3",
+  "base": "v1.10.2",
+  "sql_required": false,
+  "backend_changed": false,
+  "business_logic_changed": false,
+  "scope": "Profile + Nivel FIXIS Premium",
+  "changed_files": [
+    "lib/features/profile/screens/profile_screen.dart",
+    "lib/features/gamification/screens/gamification_screen.dart"
+  ],
+  "preserved": [
+    "avatar upload",
+    "profile bio update",
+    "legal/support external links",
+    "logout",
+    "delete_user_account RPC",
+    "expert_gamification source of truth"
+  ],
+  "next": "v1.10.4 Customer Premium Experience"
+}

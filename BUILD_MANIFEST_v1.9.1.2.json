@@ -1,0 +1,11 @@
+{
+  "version": "v1.9.1.2",
+  "base": "v1.9.1.1",
+  "changes": [
+    "login scrollable overflow fix",
+    "evidence capture max 1600x1600",
+    "lightweight previews",
+    "evidence logging and reentrancy guard",
+    "evict image previews after finish"
+  ]
+}

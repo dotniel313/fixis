@@ -1,0 +1,23 @@
+{
+  "version": "v1.10.4",
+  "base": "v1.10.3",
+  "sql_required": false,
+  "backend_changed": false,
+  "business_logic_changed": false,
+  "scope": "Customer Premium Experience",
+  "changed_files": [
+    "lib/features/customer/screens/customer_home_screen.dart",
+    "lib/features/customer/screens/create_job_screen.dart",
+    "lib/features/customer/screens/customer_job_detail_screen.dart"
+  ],
+  "preserved": [
+    "myCustomerJobsProvider",
+    "createJob",
+    "acceptQuote",
+    "customer payment flow",
+    "FIXIS Live",
+    "OSRM route + ETA",
+    "job lifecycle"
+  ],
+  "next": "v1.10.5 Admin Premium"
+}

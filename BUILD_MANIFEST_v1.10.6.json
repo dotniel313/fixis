@@ -1,0 +1,17 @@
+{
+  "version": "v1.10.6",
+  "base": "v1.10.5",
+  "sql_required": false,
+  "backend_changed": false,
+  "business_logic_changed": false,
+  "scope": "Admin Account + Premium Polish + Regression Freeze",
+  "new_files": [
+    "lib/features/admin/screens/admin_account_screen.dart",
+    "docs/REGRESSION_FREEZE_CHECKLIST.md"
+  ],
+  "changed_files": [
+    "lib/features/admin/screens/admin_payments_screen.dart"
+  ],
+  "freeze": true,
+  "next_milestone": "FIXIS PRO v2.0 RC1 after iOS regression + Android physical QA"
+}

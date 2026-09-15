@@ -1,0 +1,13 @@
+{
+  "version": "v1.9.2.0",
+  "migration": "022",
+  "scope": "weekly settlements backend",
+  "flutter_changes": false,
+  "requires_sql": true,
+  "admin_rpcs": [
+    "admin_create_weekly_settlements",
+    "admin_mark_settlement_processing",
+    "admin_mark_settlement_paid",
+    "admin_reject_settlement"
+  ]
+}

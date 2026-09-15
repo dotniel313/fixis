@@ -1,0 +1,11 @@
+{
+  "name": "FIXIS Android QA Prep",
+  "type": "non-destructive diagnostic toolkit",
+  "app_version_source": "v1.10.7.4 stable",
+  "modifies_app": false,
+  "requires_sql": false,
+  "outputs": [
+    "fixis_android_preflight_report.txt"
+  ],
+  "next": "Review report, patch Android config only if necessary, then physical E2E"
+}

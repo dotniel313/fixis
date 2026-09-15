@@ -1,0 +1,15 @@
+{
+  "version": "v1.10.1",
+  "base": "v1.10.0",
+  "sql_required": false,
+  "backend_changed": false,
+  "scope": "Map-first Professional Home",
+  "changes": [
+    "remove duplicate wallet quick action",
+    "add professional activity screen",
+    "embed professional radar map in dashboard",
+    "render service radius",
+    "render nearby job markers when coordinates are present",
+    "preserve existing nearby jobs list and accept flow"
+  ]
+}

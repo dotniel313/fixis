@@ -1,0 +1,22 @@
+{
+  "version": "v1.10.5",
+  "base": "v1.10.4",
+  "sql_required": false,
+  "backend_changed": false,
+  "business_logic_changed": false,
+  "scope": "Admin Premium",
+  "changed_files": [
+    "lib/features/admin/screens/admin_payments_screen.dart"
+  ],
+  "preserved": [
+    "adminPaymentsRepositoryProvider",
+    "payment reconciliation",
+    "evidence viewing",
+    "weekly settlement generation",
+    "settlement processing/payment/rejection",
+    "settlement audit",
+    "platform revenue summary",
+    "platform commission entries"
+  ],
+  "next": "v1.10.6 Premium polish + regression freeze"
+}

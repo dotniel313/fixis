@@ -1,0 +1,16 @@
+FIXIS PRO v1.10.7.2
+
+Después de descomprimir, copia la carpeta lib COMPLETA al proyecto.
+
+Ejemplo macOS, estando en la carpeta del proyecto Flutter:
+
+rm -rf lib
+cp -R "/RUTA/DESCOMPRIMIDA/FIXIS_PRO_v1.10.7.2_customer_profile_visibility_fix/lib" ./lib
+
+flutter clean
+flutter pub get
+flutter analyze
+flutter run
+
+No copies solo customer_profile_screen.dart: esta versión también modifica
+customer_home_screen.dart para exponer el acceso visible.

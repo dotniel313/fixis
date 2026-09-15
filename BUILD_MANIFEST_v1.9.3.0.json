@@ -1,0 +1,14 @@
+{
+  "version": "v1.9.3.0",
+  "base": "v1.9.2.4",
+  "migration": "026",
+  "scope": "professional wallet weekly payout foundation",
+  "changes": [
+    "weekly Friday payout schedule RPC",
+    "professional wallet aligned to weekly settlements",
+    "manual withdrawal CTA removed",
+    "legacy manual withdrawals preserved",
+    "FIXIS-generated requested settlements cannot be cancelled in UI",
+    "scheduled date and payout reference displayed"
+  ]
+}

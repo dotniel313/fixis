@@ -1,0 +1,15 @@
+{
+  "version": "v1.9.2.4",
+  "base": "v1.9.2.3",
+  "migration": "025",
+  "scope": "platform revenue dashboard and audit",
+  "account": "FIXIS_REVENUE_USD",
+  "features": [
+    "platform ledger balance",
+    "current month commission summary",
+    "all-time commission summary",
+    "commission count by job",
+    "snapshot vs ledger commission audit",
+    "admin FIXIS tab"
+  ]
+}
