@@ -37,6 +37,13 @@ jobs:
       - name: Flutter version
         run: flutter --version
 
+      - name: Create CI environment file
+        run: |
+          cat > .env <<'EOF'
+          SUPABASE_URL=https://example.supabase.co
+          SUPABASE_ANON_KEY=ci-placeholder-key
+          EOF
+
       - name: Install dependencies
         run: flutter pub get
 
