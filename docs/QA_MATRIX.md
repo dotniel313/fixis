@@ -1,5 +1,7 @@
 # FIXIS — QA Matrix
 
+Ultima actualizacion: 2026-09-16
+
 ## Estados
 
 - PASS
@@ -9,30 +11,37 @@
 
 ## Release actual
 
-| Área | Estado |
-|---|---|
-| Flutter Analyze | PENDING |
-| Flutter Test | PENDING |
-| Android Build | PENDING |
-| Android Physical QA | PENDING |
-| iOS Build | PENDING |
-| iOS Physical QA | PENDING |
-| Supabase Validation | PENDING |
-| Revised Quote Flow | PENDING |
-| Finance Regression | PENDING |
-| Security Regression | PENDING |
+| Area | Estado | Evidencia |
+|---|---|---|
+| Flutter Analyze | PASS | GitHub Actions en HEAD 341f786f |
+| Flutter Test | BLOCKED | No existen tests automatizados suficientes |
+| Android Build | PENDING | Requiere validacion del release actual |
+| Android Physical QA | PENDING | Requiere dispositivo |
+| iOS Build | PENDING | Correcciones de deployment integradas; falta cierre QA |
+| iOS Physical QA | PENDING | Requiere dispositivo |
+| Supabase Transactional Reset | PASS | docs/QA_TRANSACTIONAL_RESET_v1.10.8.7.md |
+| Backup Transactional | PASS | fixis_backup_reset_20260916 |
+| Revised Quote Flow | PENDING | Ejecutar E2E sobre base limpia |
+| Finance Regression | PENDING | quote -> snapshot -> payment -> ledger -> settlement |
+| Security Regression | PENDING | Validar RLS y RPC despues del E2E |
 
 ## Criterios v1.10.8.6
 
-- Preserva cotización original
-- Revisión solo en `arrived`
+- Preserva cotizacion original
+- Revision solo en arrived
 - Motivo obligatorio
-- Cliente visualiza comparación
+- Cliente visualiza comparacion
 - Rechazo conserva snapshot anterior
-- Aceptación crea snapshot vigente
+- Aceptacion crea snapshot vigente
 - Solo un snapshot current
-- Revisión pendiente bloquea start_job
+- Revision pendiente bloquea start_job
 - Payment usa snapshot vigente
 - Ledger usa snapshot vigente
 - No duplica earning
 - No duplica commission
+
+## Regla de cierre
+
+La version no puede pasar a release mientras Revised Quote Flow,
+Finance Regression, Security Regression y QA fisico permanezcan en PENDING
+o BLOCKED.
