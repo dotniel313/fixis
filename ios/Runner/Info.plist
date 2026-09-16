@@ -28,6 +28,25 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneClassName</key>
+					<string>UIWindowScene</string>
+					<key>UISceneConfigurationName</key>
+					<string>flutter</string>
+					<key>UISceneStoryboardFile</key>
+					<string>Main</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -46,19 +65,17 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<!-- INICIO PERMISOS GPS FIXIS PRO -->
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Fixis PRO necesita tu ubicación para enviarte solicitudes de clientes cercanos a ti cuando estás disponible.</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Fixis PRO necesita tu ubicación en segundo plano para mantenerte conectado con clientes de tu zona.</string>
-    <!-- FIN PERMISOS GPS -->
-    
-    <!-- INICIO PERMISOS CÁMARA Y FOTOS (UNIFICADO) -->
-    <key>NSCameraUsageDescription</key>
-    <string>Fixis PRO necesita acceder a tu cámara para que puedas actualizar tu foto de perfil y tomar la evidencia fotográfica (Antes y Después) obligatoria de tus trabajos.</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>Fixis PRO necesita acceder a tus fotos para que puedas subir una foto de perfil o evidencia guardada en tu galería.</string>
-    <!-- FIN PERMISOS CÁMARA Y FOTOS -->
-</dict>
-</plist>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Fixis PRO necesita tu ubicación para enviarte solicitudes de clientes cercanos a ti cuando estás disponible.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Fixis PRO necesita tu ubicación en segundo plano para mantenerte conectado con clientes de tu zona.</string>
+	<!-- FIN PERMISOS GPS -->
+
+	<!-- INICIO PERMISOS CÁMARA Y FOTOS (UNIFICADO) -->
+	<key>NSCameraUsageDescription</key>
+	<string>Fixis PRO necesita acceder a tu cámara para que puedas actualizar tu foto de perfil y tomar la evidencia fotográfica (Antes y Después) obligatoria de tus trabajos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Fixis PRO necesita acceder a tus fotos para que puedas subir una foto de perfil o evidencia guardada en tu galería.</string>
+	<!-- FIN PERMISOS CÁMARA Y FOTOS -->
 </dict>
 </plist>
