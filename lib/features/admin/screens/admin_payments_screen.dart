@@ -16,7 +16,12 @@ class AdminPaymentsScreen extends ConsumerStatefulWidget {
 
 class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
   bool _loading = true;
-  String? _error;
+
+  String? _pendingError;
+  String? _historyError;
+  String? _settlementsError;
+  String? _revenueError;
+
   List<Map<String, dynamic>> _pending = const [];
   List<Map<String, dynamic>> _resolved = const [];
   List<Map<String, dynamic>> _openSettlements = const [];
@@ -31,46 +36,121 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
     _load();
   }
 
+  bool get _hasAnyData =>
+      _pending.isNotEmpty ||
+      _resolved.isNotEmpty ||
+      _openSettlements.isNotEmpty ||
+      _settlementHistory.isNotEmpty ||
+      _settlementAudit.isNotEmpty ||
+      _platformRevenue.isNotEmpty ||
+      _platformCommissions.isNotEmpty;
+
   Future<void> _load() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-
-    try {
-      final repo = ref.read(adminPaymentsRepositoryProvider);
-      final now = DateTime.now();
-      final monthStart = DateTime(now.year, now.month, 1);
-
-      final results = await Future.wait([
-        repo.getPendingPayments(),
-        repo.getRecentResolvedPayments(),
-        repo.getOpenSettlements(),
-        repo.getRecentSettlements(),
-        repo.getSettlementAudit(),
-        repo.getPlatformRevenueSummary(
-          from: monthStart,
-          to: now,
-        ),
-        repo.getPlatformCommissionEntries(),
-      ]);
-
-      if (!mounted) return;
+    if (mounted) {
       setState(() {
-        _pending = results[0] as List<Map<String, dynamic>>;
-        _resolved = results[1] as List<Map<String, dynamic>>;
-        _openSettlements = results[2] as List<Map<String, dynamic>>;
-        _settlementHistory = results[3] as List<Map<String, dynamic>>;
-        _settlementAudit = results[4] as List<Map<String, dynamic>>;
-        _platformRevenue = results[5] as Map<String, dynamic>;
-        _platformCommissions = results[6] as List<Map<String, dynamic>>;
+        _loading = true;
+        _pendingError = null;
+        _historyError = null;
+        _settlementsError = null;
+        _revenueError = null;
       });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _error = e.toString());
-    } finally {
-      if (mounted) setState(() => _loading = false);
     }
+
+    final repo = ref.read(adminPaymentsRepositoryProvider);
+    final now = DateTime.now();
+    final monthStart = DateTime(now.year, now.month, 1);
+
+    List<Map<String, dynamic>>? pending;
+    List<Map<String, dynamic>>? resolved;
+    List<Map<String, dynamic>>? openSettlements;
+    List<Map<String, dynamic>>? settlementHistory;
+    List<Map<String, dynamic>>? settlementAudit;
+    Map<String, dynamic>? platformRevenue;
+    List<Map<String, dynamic>>? platformCommissions;
+
+    String? pendingError;
+    String? historyError;
+    final settlementErrors = <String>[];
+    final revenueErrors = <String>[];
+
+    await Future.wait<void>([
+      () async {
+        try {
+          pending = await repo.getPendingPayments();
+        } catch (e) {
+          pendingError = 'Pagos pendientes: $e';
+        }
+      }(),
+      () async {
+        try {
+          resolved = await repo.getRecentResolvedPayments();
+        } catch (e) {
+          historyError = 'Historial de pagos: $e';
+        }
+      }(),
+      () async {
+        try {
+          openSettlements = await repo.getOpenSettlements();
+        } catch (e) {
+          settlementErrors.add('Liquidaciones abiertas: $e');
+        }
+      }(),
+      () async {
+        try {
+          settlementHistory = await repo.getRecentSettlements();
+        } catch (e) {
+          settlementErrors.add('Historial de liquidaciones: $e');
+        }
+      }(),
+      () async {
+        try {
+          settlementAudit = await repo.getSettlementAudit();
+        } catch (e) {
+          settlementErrors.add('Auditoría de liquidaciones: $e');
+        }
+      }(),
+      () async {
+        try {
+          platformRevenue = await repo.getPlatformRevenueSummary(
+            from: monthStart,
+            to: now,
+          );
+        } catch (e) {
+          revenueErrors.add('Resumen de ingresos: $e');
+        }
+      }(),
+      () async {
+        try {
+          platformCommissions = await repo.getPlatformCommissionEntries();
+        } catch (e) {
+          revenueErrors.add('Detalle de comisiones: $e');
+        }
+      }(),
+    ]);
+
+    if (!mounted) return;
+
+    setState(() {
+      if (pending != null) _pending = pending!;
+      if (resolved != null) _resolved = resolved!;
+      if (openSettlements != null) _openSettlements = openSettlements!;
+      if (settlementHistory != null) {
+        _settlementHistory = settlementHistory!;
+      }
+      if (settlementAudit != null) _settlementAudit = settlementAudit!;
+      if (platformRevenue != null) _platformRevenue = platformRevenue!;
+      if (platformCommissions != null) {
+        _platformCommissions = platformCommissions!;
+      }
+
+      _pendingError = pendingError;
+      _historyError = historyError;
+      _settlementsError = settlementErrors.isEmpty
+          ? null
+          : settlementErrors.join('\n');
+      _revenueError = revenueErrors.isEmpty ? null : revenueErrors.join('\n');
+      _loading = false;
+    });
   }
 
   @override
@@ -116,7 +196,7 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
             ),
             tabs: [
               Tab(text: 'Verificar (${_pending.length})'),
-              const Tab(text: 'Historial'),
+              Tab(text: 'Historial (${_resolved.length})'),
               Tab(text: 'Liquidaciones (${_openSettlements.length})'),
               const Tab(text: 'Ingresos FIXIS'),
             ],
@@ -125,7 +205,7 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
         body: SafeArea(
           top: false,
           minimum: const EdgeInsets.fromLTRB(6, 0, 6, 8),
-          child: _loading
+          child: _loading && !_hasAnyData
               ? const Center(child: CircularProgressIndicator())
               : TabBarView(
                   children: [
@@ -141,11 +221,11 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
   }
 
   Widget _pendingTab() {
-    if (_error != null) {
+    if (_pendingError != null && _pending.isEmpty) {
       return _empty(
         Icons.error_outline,
         'No pudimos cargar los pagos',
-        _error!,
+        _pendingError!,
       );
     }
 
@@ -159,16 +239,33 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
 
     return RefreshIndicator(
       onRefresh: _load,
-      child: ListView.separated(
+      child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-        itemCount: _pending.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemBuilder: (_, index) => _pendingCard(_pending[index]),
+        children: [
+          if (_pendingError != null) ...[
+            _inlineError('Pagos', _pendingError!),
+            const SizedBox(height: 12),
+          ],
+          ..._pending.map(
+            (payment) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _pendingCard(payment),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _resolvedTab() {
+    if (_historyError != null && _resolved.isEmpty) {
+      return _empty(
+        Icons.error_outline,
+        'No pudimos cargar el historial',
+        _historyError!,
+      );
+    }
+
     if (_resolved.isEmpty) {
       return _empty(
         Icons.receipt_long_outlined,
@@ -179,66 +276,75 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
 
     return RefreshIndicator(
       onRefresh: _load,
-      child: ListView.separated(
+      child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-        itemCount: _resolved.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
-        itemBuilder: (_, index) {
-          final row = _resolved[index];
-          final status = row['status']?.toString() ?? '-';
-          final paid = status == 'paid';
-
-          final color = paid ? AppTheme.success : AppTheme.danger;
-          return FixisSurface(
-            padding: EdgeInsets.zero,
-            shadows: const [],
-            radius: AppTheme.radiusMd,
-            border: Border.all(color: AppTheme.slate200),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
-              leading: Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: .10),
-                  borderRadius: BorderRadius.circular(13),
-                ),
-                child: Icon(
-                  paid ? Icons.check_rounded : Icons.close_rounded,
-                  color: color,
-                ),
-              ),
-              title: Text(
-                row['job_title']?.toString() ?? 'Servicio FIXIS',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w900,
-                  color: AppTheme.darkSlate,
-                ),
-              ),
-              subtitle: Text(
-                '${row['customer_name'] ?? 'Cliente FIXIS'} · ${_money(row['total_due'])} · ${paid ? 'Pagado' : 'Rechazado'}',
-                style: const TextStyle(color: AppTheme.slate500),
-              ),
-              trailing: FixisStatusPill(
-                label: paid ? 'PAGADO' : 'RECHAZADO',
-                color: color,
-                icon: paid
-                    ? Icons.verified_rounded
-                    : Icons.warning_amber_rounded,
-              ),
-            ),
-          );
-        },
+        children: [
+          if (_historyError != null) ...[
+            _inlineError('Historial', _historyError!),
+            const SizedBox(height: 12),
+          ],
+          ..._resolved.map(_resolvedCard),
+        ],
       ),
     );
   }
 
+  Widget _resolvedCard(Map<String, dynamic> row) {
+    final status = row['status']?.toString() ?? '-';
+    final paid = status == 'paid';
+    final color = paid ? AppTheme.success : AppTheme.danger;
 
+    return FixisSurface(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.zero,
+      shadows: const [],
+      radius: AppTheme.radiusMd,
+      border: Border.all(color: AppTheme.slate200),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: .10),
+            borderRadius: BorderRadius.circular(13),
+          ),
+          child: Icon(
+            paid ? Icons.check_rounded : Icons.close_rounded,
+            color: color,
+          ),
+        ),
+        title: Text(
+          row['job_title']?.toString() ?? 'Servicio FIXIS',
+          style: const TextStyle(
+            fontWeight: FontWeight.w900,
+            color: AppTheme.darkSlate,
+          ),
+        ),
+        subtitle: Text(
+          '${row['customer_name'] ?? 'Cliente FIXIS'} · ${_money(row['total_due'])} · ${paid ? 'Pagado' : 'Rechazado'}',
+          style: const TextStyle(color: AppTheme.slate500),
+        ),
+        trailing: FixisStatusPill(
+          label: paid ? 'PAGADO' : 'RECHAZADO',
+          color: color,
+          icon: paid ? Icons.verified_rounded : Icons.warning_amber_rounded,
+        ),
+      ),
+    );
+  }
 
   Widget _platformRevenueTab() {
+    if (_revenueError != null &&
+        _platformRevenue.isEmpty &&
+        _platformCommissions.isEmpty) {
+      return _empty(
+        Icons.error_outline,
+        'No pudimos cargar los ingresos FIXIS',
+        _revenueError!,
+      );
+    }
+
     final balance = _platformRevenue['ledger_balance'];
     final period = _platformRevenue['period_commissions'];
     final allTime = _platformRevenue['all_time_commissions'];
@@ -251,6 +357,10 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          if (_revenueError != null) ...[
+            _inlineError('Ingresos FIXIS', _revenueError!),
+            const SizedBox(height: 14),
+          ],
           Container(
             padding: const EdgeInsets.all(20),
             decoration: const BoxDecoration(
@@ -472,85 +582,92 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
       radius: AppTheme.radiusMd,
       border: Border.all(color: AppTheme.slate200),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    row['job_title']?.toString() ?? 'Servicio FIXIS',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                    ),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  row['job_title']?.toString() ?? 'Servicio FIXIS',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
+              ),
+              Text(
+                _money(row['ledger_commission']),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          _field('Total servicio', _money(row['gross_amount'])),
+          _field('Mano de obra', _money(row['labor_amount'])),
+          _field('Materiales', _money(row['materials_amount'])),
+          _field(
+            'Comisión',
+            '${_money(row['snapshot_commission'])} · '
+            '${_toDouble(row['commission_rate_percent']).toStringAsFixed(2)}%',
+          ),
+          _field('Profesional', _money(row['professional_amount'])),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: (ok ? Colors.green : Colors.red).withValues(alpha: 0.07),
+              border: Border.all(
+                color: (ok ? Colors.green : Colors.red).withValues(alpha: 0.25),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  ok ? Icons.verified_rounded : Icons.warning_amber_rounded,
+                  size: 17,
+                  color: ok ? Colors.green : AppTheme.danger,
+                ),
+                const SizedBox(width: 6),
                 Text(
-                  _money(row['ledger_commission']),
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
+                  ok ? 'Comisión verificada' : 'Revisar comisión',
+                  style: TextStyle(
+                    color: ok ? Colors.green : AppTheme.danger,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            _field('Total servicio', _money(row['gross_amount'])),
-            _field('Mano de obra', _money(row['labor_amount'])),
-            _field('Materiales', _money(row['materials_amount'])),
-            _field(
-              'Comisión',
-              '${_money(row['snapshot_commission'])} · '
-              '${_toDouble(row['commission_rate_percent']).toStringAsFixed(2)}%',
-            ),
-            _field('Profesional', _money(row['professional_amount'])),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 7,
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: (ok ? Colors.green : Colors.red)
-                    .withValues(alpha: 0.07),
-                border: Border.all(
-                  color: (ok ? Colors.green : Colors.red)
-                      .withValues(alpha: 0.25),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    ok
-                        ? Icons.verified_rounded
-                        : Icons.warning_amber_rounded,
-                    size: 17,
-                    color: ok ? Colors.green : AppTheme.danger,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    ok ? 'Comisión verificada' : 'Revisar comisión',
-                    style: TextStyle(
-                      color: ok ? Colors.green : AppTheme.danger,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _settlementsTab() {
+    if (_settlementsError != null &&
+        _openSettlements.isEmpty &&
+        _settlementHistory.isEmpty) {
+      return _empty(
+        Icons.error_outline,
+        'No pudimos cargar las liquidaciones',
+        _settlementsError!,
+      );
+    }
+
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          if (_settlementsError != null) ...[
+            _inlineError('Liquidaciones', _settlementsError!),
+            const SizedBox(height: 14),
+          ],
           FilledButton.icon(
             onPressed: _loading ? null : _generateWeeklyCut,
             icon: const Icon(Icons.calendar_month_rounded),
@@ -585,7 +702,6 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
     );
   }
 
-
   Map<String, dynamic>? _auditForSettlement(String settlementId) {
     for (final audit in _settlementAudit) {
       if (audit['settlement_id']?.toString() == settlementId) {
@@ -599,16 +715,8 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
     final status = audit?['audit_status']?.toString() ?? 'unknown';
 
     final (label, icon, color) = switch (status) {
-      'ok' => (
-          'Ledger verificado',
-          Icons.verified_rounded,
-          AppTheme.success,
-        ),
-      'reserved' => (
-          'Saldo reservado',
-          Icons.lock_clock_rounded,
-          AppTheme.warning,
-        ),
+      'ok' => ('Ledger verificado', Icons.verified_rounded, AppTheme.success),
+      'reserved' => ('Saldo reservado', Icons.lock_clock_rounded, AppTheme.warning),
       'closed_without_debit' => (
           'Cerrada sin débito',
           Icons.block_rounded,
@@ -642,10 +750,7 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
           Flexible(
             child: Text(
               label,
-              style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.w800,
-              ),
+              style: TextStyle(color: color, fontWeight: FontWeight.w800),
             ),
           ),
         ],
@@ -666,97 +771,89 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
       radius: AppTheme.radiusMd,
       border: Border.all(color: AppTheme.slate200),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.payments_outlined),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    _money(settlement['requested_amount']),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                    ),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.payments_outlined),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  _money(settlement['requested_amount']),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
-                Text(
-                  _settlementStatusLabel(status),
-                  style: const TextStyle(fontWeight: FontWeight.w800),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            _field(
-              'Profesional',
-              settlement['professional_name']?.toString().trim().isNotEmpty == true
-                  ? settlement['professional_name'].toString()
-                  : 'Profesional FIXIS',
-            ),
-            _field('Banco', settlement['bank_name']?.toString() ?? '-'),
-            _field(
-              'Cuenta',
-              '${settlement['bank_account_type'] ?? '-'} · '
-              '${settlement['bank_account_number'] ?? '-'}',
-            ),
-            _field(
-              'Programado',
-              settlement['scheduled_for']?.toString() ?? 'Sin fecha',
-            ),
-            if (settlement['payout_reference'] != null)
-              _field(
-                'Referencia',
-                settlement['payout_reference'].toString(),
               ),
-            if (audit != null) ...[
-              _field(
-                'Asignado',
-                _money(audit['allocated_amount']),
+              Text(
+                _settlementStatusLabel(status),
+                style: const TextStyle(fontWeight: FontWeight.w800),
               ),
-              if (status == 'paid')
-                _field(
-                  'Débito ledger',
-                  '${audit['settlement_debit_count'] ?? 0} · '
-                  '${_money(audit['settlement_debit_amount'])}',
-                ),
-              _auditBadge(audit),
             ],
-            if (requested || processing) ...[
-              const SizedBox(height: 12),
-              if (requested)
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: () => _markProcessing(settlement),
-                    icon: const Icon(Icons.sync_rounded),
-                    label: const Text('Pasar a procesamiento'),
-                  ),
-                ),
-              if (processing)
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: () => _markSettlementPaid(settlement),
-                    icon: const Icon(Icons.check_circle_outline_rounded),
-                    label: const Text('Marcar como pagada'),
-                  ),
-                ),
-              const SizedBox(height: 6),
+          ),
+          const SizedBox(height: 10),
+          _field(
+            'Profesional',
+            settlement['professional_name']?.toString().trim().isNotEmpty == true
+                ? settlement['professional_name'].toString()
+                : 'Profesional FIXIS',
+          ),
+          _field('Banco', settlement['bank_name']?.toString() ?? '-'),
+          _field(
+            'Cuenta',
+            '${settlement['bank_account_type'] ?? '-'} · '
+            '${settlement['bank_account_number'] ?? '-'}',
+          ),
+          _field(
+            'Programado',
+            settlement['scheduled_for']?.toString() ?? 'Sin fecha',
+          ),
+          if (settlement['payout_reference'] != null)
+            _field('Referencia', settlement['payout_reference'].toString()),
+          if (audit != null) ...[
+            _field('Asignado', _money(audit['allocated_amount'])),
+            if (status == 'paid')
+              _field(
+                'Débito ledger',
+                '${audit['settlement_debit_count'] ?? 0} · '
+                '${_money(audit['settlement_debit_amount'])}',
+              ),
+            _auditBadge(audit),
+          ],
+          if (requested || processing) ...[
+            const SizedBox(height: 12),
+            if (requested)
               SizedBox(
                 width: double.infinity,
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                  ),
-                  onPressed: () => _rejectSettlement(settlement),
-                  icon: const Icon(Icons.close_rounded),
-                  label: const Text('Rechazar liquidación'),
+                child: FilledButton.icon(
+                  onPressed: () => _markProcessing(settlement),
+                  icon: const Icon(Icons.sync_rounded),
+                  label: const Text('Pasar a procesamiento'),
                 ),
               ),
-            ],
+            if (processing)
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () => _markSettlementPaid(settlement),
+                  icon: const Icon(Icons.check_circle_outline_rounded),
+                  label: const Text('Marcar como pagada'),
+                ),
+              ),
+            const SizedBox(height: 6),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                onPressed: () => _rejectSettlement(settlement),
+                icon: const Icon(Icons.close_rounded),
+                label: const Text('Rechazar liquidación'),
+              ),
+            ),
           ],
-        ),
+        ],
+      ),
     );
   }
 
@@ -805,9 +902,7 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
     }
   }
 
-  Future<void> _markSettlementPaid(
-    Map<String, dynamic> settlement,
-  ) async {
+  Future<void> _markSettlementPaid(Map<String, dynamic> settlement) async {
     final result = await showDialog<Map<String, String>>(
       context: context,
       builder: (dialogContext) {
@@ -882,9 +977,7 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
     }
   }
 
-  Future<void> _rejectSettlement(
-    Map<String, dynamic> settlement,
-  ) async {
+  Future<void> _rejectSettlement(Map<String, dynamic> settlement) async {
     final reason = await showDialog<String>(
       context: context,
       builder: (dialogContext) {
@@ -945,8 +1038,10 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
     final evidence = payment['latest_evidence'] as Map<String, dynamic>?;
     final reference = payment['reference_code']?.toString() ?? '-';
     final jobTitle = payment['job_title']?.toString() ?? 'Servicio FIXIS';
-    final customerName = payment['customer_name']?.toString() ?? 'Cliente FIXIS';
-    final professionalName = payment['professional_name']?.toString() ?? 'Fixi';
+    final customerName =
+        payment['customer_name']?.toString() ?? 'Cliente FIXIS';
+    final professionalName =
+        payment['professional_name']?.toString() ?? 'Fixi';
     final amount = _money(payment['total_due']);
 
     return FixisSurface(
@@ -955,102 +1050,98 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
       radius: AppTheme.radiusMd,
       border: Border.all(color: AppTheme.slate200),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.account_balance_rounded,
-                  color: AppTheme.primaryBlue,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    jobTitle,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-                Text(
-                  amount,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.account_balance_rounded,
+                color: AppTheme.primaryBlue,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  jobTitle,
                   style: const TextStyle(
-                    fontSize: 19,
+                    fontSize: 18,
                     fontWeight: FontWeight.w900,
-                    color: AppTheme.primaryOrange,
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            _field('Estado', payment['status']?.toString() ?? '-'),
-            _field('Cliente', customerName),
-            _field('Fixi', professionalName),
-            _field('Categoría', payment['job_category']?.toString() ?? '-'),
-            _field('Dirección', payment['job_address']?.toString() ?? '-'),
-            _field('Referencia de pago', reference),
-            _field(
-              'Banco declarado',
-              evidence?['declared_bank']?.toString() ?? 'No indicado',
-            ),
-            _field(
-              'Referencia bancaria',
-              evidence?['declared_reference']?.toString() ?? 'No indicada',
-            ),
-            const SizedBox(height: 14),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final compact = constraints.maxWidth < 360;
+              ),
+              Text(
+                amount,
+                style: const TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w900,
+                  color: AppTheme.primaryOrange,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _field('Estado', payment['status']?.toString() ?? '-'),
+          _field('Cliente', customerName),
+          _field('Fixi', professionalName),
+          _field('Categoría', payment['job_category']?.toString() ?? '-'),
+          _field('Dirección', payment['job_address']?.toString() ?? '-'),
+          _field('Referencia de pago', reference),
+          _field(
+            'Banco declarado',
+            evidence?['declared_bank']?.toString() ?? 'No indicado',
+          ),
+          _field(
+            'Referencia bancaria',
+            evidence?['declared_reference']?.toString() ?? 'No indicada',
+          ),
+          const SizedBox(height: 14),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxWidth < 360;
 
-                final voucherButton = OutlinedButton.icon(
-                  onPressed: evidence == null
-                      ? null
-                      : () => _openEvidence(evidence),
-                  icon: const Icon(Icons.image_outlined),
-                  label: const Text('Ver voucher'),
-                );
+              final voucherButton = OutlinedButton.icon(
+                onPressed: evidence == null ? null : () => _openEvidence(evidence),
+                icon: const Icon(Icons.image_outlined),
+                label: const Text('Ver voucher'),
+              );
 
-                final rejectButton = OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                  ),
-                  onPressed: () => _reject(payment),
-                  icon: const Icon(Icons.close_rounded),
-                  label: const Text('Rechazar'),
-                );
+              final rejectButton = OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                onPressed: () => _reject(payment),
+                icon: const Icon(Icons.close_rounded),
+                label: const Text('Rechazar'),
+              );
 
-                if (compact) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      voucherButton,
-                      const SizedBox(height: 8),
-                      rejectButton,
-                    ],
-                  );
-                }
-
-                return Row(
+              if (compact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(child: voucherButton),
-                    const SizedBox(width: 10),
-                    Expanded(child: rejectButton),
+                    voucherButton,
+                    const SizedBox(height: 8),
+                    rejectButton,
                   ],
                 );
-              },
+              }
+
+              return Row(
+                children: [
+                  Expanded(child: voucherButton),
+                  const SizedBox(width: 10),
+                  Expanded(child: rejectButton),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: () => _confirm(payment),
+              icon: const Icon(Icons.verified_rounded),
+              label: const Text('Confirmar acreditación'),
             ),
-            const SizedBox(height: 8),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: () => _confirm(payment),
-                icon: const Icon(Icons.verified_rounded),
-                label: const Text('Confirmar acreditación'),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1126,11 +1217,9 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
         },
       );
 
-      // Payment vouchers can be high-resolution phone photos.
-      // Release the decoded image after closing the viewer to reduce
-      // memory pressure before navigating to another admin screen.
       await provider.evict();
     } catch (e) {
+      if (!mounted) return;
       _snack(e.toString(), Colors.red);
     }
   }
@@ -1274,8 +1363,6 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
     }
   }
 
-
-
   String _settlementStatusLabel(String status) {
     return switch (status) {
       'requested' => 'Pendiente',
@@ -1304,6 +1391,47 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
             child: Text(
               value,
               style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _inlineError(String title, String message) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.danger.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.danger.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.error_outline, color: AppTheme.danger),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$title: carga parcial',
+                  style: const TextStyle(
+                    color: AppTheme.danger,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  message,
+                  style: const TextStyle(
+                    color: AppTheme.darkSlate,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -1345,15 +1473,11 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
       double.tryParse(value?.toString() ?? '') ??
       0;
 
-  String _money(dynamic value) =>
-      '\$${_toDouble(value).toStringAsFixed(2)}';
+  String _money(dynamic value) => '\$${_toDouble(value).toStringAsFixed(2)}';
 
   void _snack(String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: color,
-      ),
+      SnackBar(content: Text(message), backgroundColor: color),
     );
   }
 }
