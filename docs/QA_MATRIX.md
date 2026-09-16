@@ -17,10 +17,12 @@ Ultima actualizacion: 2026-09-16
 | Flutter Test | BLOCKED | No existen tests automatizados suficientes |
 | Android Build | PENDING | Requiere validacion del release actual |
 | Android Physical QA | PENDING | Requiere dispositivo |
-| iOS Build | PENDING | Correcciones de deployment integradas; falta cierre QA |
-| iOS Physical QA | PENDING | Requiere dispositivo |
+| iOS Build | PASS | Compilacion e instalacion mediante flutter run en iPhone 15 |
+| iOS Install/Launch Smoke | PASS | Runner inicio correctamente; pausa observada correspondia a breakpoint local de Xcode |
+| iOS Physical QA | PENDING | Falta ejecutar el flujo funcional end-to-end |
 | Supabase Transactional Reset | PASS | docs/QA_TRANSACTIONAL_RESET_v1.10.8.7.md |
 | Backup Transactional | PASS | fixis_backup_reset_20260916 |
+| Clean Database Baseline | PASS | jobs, quotes, snapshots, ledger, payments, commissions, settlements y settlement_items = 0 |
 | Revised Quote Flow | PENDING | Ejecutar E2E sobre base limpia |
 | Finance Regression | PENDING | quote -> snapshot -> payment -> ledger -> settlement |
 | Security Regression | PENDING | Validar RLS y RPC despues del E2E |
