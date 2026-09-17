@@ -226,10 +226,14 @@ class _CreateJobScreenState extends ConsumerState<CreateJobScreen> {
           style: TextStyle(fontWeight: FontWeight.w900),
         ),
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
           children: [
             Container(
               padding: const EdgeInsets.all(20),
@@ -576,7 +580,8 @@ class _CreateJobScreenState extends ConsumerState<CreateJobScreen> {
                 fontSize: 11.5,
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );
