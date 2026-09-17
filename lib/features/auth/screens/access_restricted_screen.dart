@@ -95,6 +95,7 @@ class _AccessRestrictedScreenState
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
       body: SafeArea(
+        minimum: const EdgeInsets.only(bottom: 12),
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Center(

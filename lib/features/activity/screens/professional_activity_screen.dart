@@ -20,169 +20,173 @@ class ProfessionalActivityScreen extends ConsumerWidget {
           style: TextStyle(fontWeight: FontWeight.w900),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppTheme.midnight, AppTheme.midnightSoft],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.all(
-                Radius.circular(AppTheme.radiusLg),
-              ),
-            ),
-            child: const Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Actividad FIXIS',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 21,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        'Tu operación activa en un solo lugar',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppTheme.midnight, AppTheme.midnightSoft],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                Icon(
-                  Icons.insights_rounded,
-                  color: AppTheme.primaryOrange,
-                  size: 34,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(AppTheme.radiusLg),
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 22),
-          activeAsync.when(
-            loading: () => const Center(
-              child: Padding(
-                padding: EdgeInsets.all(30),
-                child: CircularProgressIndicator(),
               ),
-            ),
-            error: (_, __) => const FixisSurface(
-              shadows: [],
-              child: Text(
-                'No pudimos cargar tu actividad en este momento.',
-              ),
-            ),
-            data: (jobs) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: const Row(
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _MetricCard(
-                          label: 'Activos',
-                          value: '${jobs.length}',
-                          icon: Icons.work_outline_rounded,
-                          color: AppTheme.primaryBlue,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Actividad FIXIS',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 21,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _MetricCard(
-                          label: 'En ejecución',
-                          value:
-                              '${jobs.where((j) => j['status'] == 'in_progress').length}',
-                          icon: Icons.play_circle_outline_rounded,
-                          color: AppTheme.success,
+                        SizedBox(height: 5),
+                        Text(
+                          'Tu operación activa en un solo lugar',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 22),
-                  const FixisSectionHeader(
-                    title: 'Servicios en curso',
-                    subtitle: 'Acceso rápido a tus trabajos operativos',
+                  Icon(
+                    Icons.insights_rounded,
+                    color: AppTheme.primaryOrange,
+                    size: 34,
                   ),
-                  const SizedBox(height: 12),
-                  if (jobs.isEmpty)
-                    const FixisSurface(
-                      shadows: [],
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle_outline_rounded,
+                ],
+              ),
+            ),
+            const SizedBox(height: 22),
+            activeAsync.when(
+              loading: () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(30),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+              error: (_, __) => const FixisSurface(
+                shadows: [],
+                child: Text(
+                  'No pudimos cargar tu actividad en este momento.',
+                ),
+              ),
+              data: (jobs) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _MetricCard(
+                            label: 'Activos',
+                            value: '${jobs.length}',
+                            icon: Icons.work_outline_rounded,
+                            color: AppTheme.primaryBlue,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _MetricCard(
+                            label: 'En ejecución',
+                            value:
+                                '${jobs.where((j) => j['status'] == 'in_progress').length}',
+                            icon: Icons.play_circle_outline_rounded,
                             color: AppTheme.success,
                           ),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'No tienes servicios activos en este momento.',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 22),
+                    const FixisSectionHeader(
+                      title: 'Servicios en curso',
+                      subtitle: 'Acceso rápido a tus trabajos operativos',
+                    ),
+                    const SizedBox(height: 12),
+                    if (jobs.isEmpty)
+                      const FixisSurface(
+                        shadows: [],
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle_outline_rounded,
+                              color: AppTheme.success,
                             ),
-                          ),
-                        ],
-                      ),
-                    )
-                  else
-                    ...jobs.map(
-                      (job) => Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: FixisSurface(
-                          padding: EdgeInsets.zero,
-                          shadows: const [],
-                          border: Border.all(color: AppTheme.slate200),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            leading: Container(
-                              width: 42,
-                              height: 42,
-                              decoration: BoxDecoration(
-                                color:
-                                    AppTheme.primaryBlue.withValues(alpha: .08),
-                                borderRadius: BorderRadius.circular(13),
-                              ),
-                              child: const Icon(
-                                Icons.handyman_rounded,
-                                color: AppTheme.primaryBlue,
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'No tienes servicios activos en este momento.',
                               ),
                             ),
-                            title: Text(
-                              job['title']?.toString() ?? 'Servicio',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w800,
+                          ],
+                        ),
+                      )
+                    else
+                      ...jobs.map(
+                        (job) => Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: FixisSurface(
+                            padding: EdgeInsets.zero,
+                            shadows: const [],
+                            border: Border.all(color: AppTheme.slate200),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
                               ),
-                            ),
-                            subtitle: Text(
-                              _statusLabel(job['status']?.toString() ?? ''),
-                            ),
-                            trailing: const Icon(Icons.chevron_right_rounded),
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => JobDetailScreen(job: job),
+                              leading: Container(
+                                width: 42,
+                                height: 42,
+                                decoration: BoxDecoration(
+                                  color:
+                                      AppTheme.primaryBlue.withValues(alpha: .08),
+                                  borderRadius: BorderRadius.circular(13),
+                                ),
+                                child: const Icon(
+                                  Icons.handyman_rounded,
+                                  color: AppTheme.primaryBlue,
+                                ),
+                              ),
+                              title: Text(
+                                job['title']?.toString() ?? 'Servicio',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              subtitle: Text(
+                                _statusLabel(job['status']?.toString() ?? ''),
+                              ),
+                              trailing: const Icon(Icons.chevron_right_rounded),
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => JobDetailScreen(job: job),
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                ],
-              );
-            },
-          ),
-        ],
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

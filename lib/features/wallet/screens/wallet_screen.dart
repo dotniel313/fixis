@@ -173,66 +173,70 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
           ),
         ],
       ),
-      body: walletAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _buildError(error),
-        data: (data) {
-          final summary = Map<String, dynamic>.from(data['summary'] as Map);
-          final payoutSchedule =
-              Map<String, dynamic>.from(data['payout_schedule'] as Map);
-          final earnings = List<Map<String, dynamic>>.from(data['earnings'] as List);
-          final settlements = List<Map<String, dynamic>>.from(data['settlements'] as List);
-
-          final available = _toDouble(summary['available_balance']);
-          final reserved = _toDouble(summary['reserved_balance']);
-          final earned = _toDouble(summary['total_earned']);
-          final withdrawn = _toDouble(summary['total_withdrawn']);
-
-          return RefreshIndicator(
-            onRefresh: _refresh,
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 32),
-              children: [
-                _buildBalanceCard(
-                  available: available,
-                  reserved: reserved,
-                  earned: earned,
-                  withdrawn: withdrawn,
-                ),
-                const SizedBox(height: 16),
-                _buildNextPayoutCard(
-                  payoutSchedule: payoutSchedule,
-                  available: available,
-                ),
-                const SizedBox(height: 24),
-                _buildMetrics(
-                  reserved: reserved,
-                  earned: earned,
-                  withdrawn: withdrawn,
-                ),
-                const SizedBox(height: 32),
-                _sectionTitle('Cuenta de destino'),
-                const SizedBox(height: 12),
-                _buildBankCard(profileAsync),
-                const SizedBox(height: 32),
-                _sectionTitle('Liquidaciones'),
-                const SizedBox(height: 12),
-                if (settlements.isEmpty)
-                  _emptyCard('Aún no tienes liquidaciones registradas.')
-                else
-                  ...settlements.map(_buildSettlementItem),
-                const SizedBox(height: 32),
-                _sectionTitle('Ganancias recientes'),
-                const SizedBox(height: 12),
-                if (earnings.isEmpty)
-                  _emptyCard('Aún no tienes ganancias registradas en el ledger.')
-                else
-                  ...earnings.map(_buildEarningItem),
-                const SizedBox(height: 24),
-              ],
-            ),
-          );
-        },
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: walletAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => _buildError(error),
+          data: (data) {
+            final summary = Map<String, dynamic>.from(data['summary'] as Map);
+            final payoutSchedule =
+                Map<String, dynamic>.from(data['payout_schedule'] as Map);
+            final earnings = List<Map<String, dynamic>>.from(data['earnings'] as List);
+            final settlements = List<Map<String, dynamic>>.from(data['settlements'] as List);
+  
+            final available = _toDouble(summary['available_balance']);
+            final reserved = _toDouble(summary['reserved_balance']);
+            final earned = _toDouble(summary['total_earned']);
+            final withdrawn = _toDouble(summary['total_withdrawn']);
+  
+            return RefreshIndicator(
+              onRefresh: _refresh,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 32),
+                children: [
+                  _buildBalanceCard(
+                    available: available,
+                    reserved: reserved,
+                    earned: earned,
+                    withdrawn: withdrawn,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildNextPayoutCard(
+                    payoutSchedule: payoutSchedule,
+                    available: available,
+                  ),
+                  const SizedBox(height: 24),
+                  _buildMetrics(
+                    reserved: reserved,
+                    earned: earned,
+                    withdrawn: withdrawn,
+                  ),
+                  const SizedBox(height: 32),
+                  _sectionTitle('Cuenta de destino'),
+                  const SizedBox(height: 12),
+                  _buildBankCard(profileAsync),
+                  const SizedBox(height: 32),
+                  _sectionTitle('Liquidaciones'),
+                  const SizedBox(height: 12),
+                  if (settlements.isEmpty)
+                    _emptyCard('Aún no tienes liquidaciones registradas.')
+                  else
+                    ...settlements.map(_buildSettlementItem),
+                  const SizedBox(height: 32),
+                  _sectionTitle('Ganancias recientes'),
+                  const SizedBox(height: 12),
+                  if (earnings.isEmpty)
+                    _emptyCard('Aún no tienes ganancias registradas en el ledger.')
+                  else
+                    ...earnings.map(_buildEarningItem),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

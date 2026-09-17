@@ -204,7 +204,7 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
         ),
         body: SafeArea(
           top: false,
-          minimum: const EdgeInsets.fromLTRB(6, 0, 6, 8),
+          minimum: const EdgeInsets.only(bottom: 12),
           child: _loading && !_hasAnyData
               ? const Center(child: CircularProgressIndicator())
               : TabBarView(

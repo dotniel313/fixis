@@ -111,316 +111,320 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
         ],
       ),
-      body: profileAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Text(
-              'No fue posible cargar tu perfil.\n$err',
-              textAlign: TextAlign.center,
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: profileAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, _) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                'No fue posible cargar tu perfil.\n$err',
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
-        ),
-        data: (profile) {
-          final name = profile?['full_name']?.toString() ?? 'Profesional FIXIS';
-          final category = profile?['category']?.toString() ?? 'Especialista';
-          final phone = profile?['phone']?.toString() ?? 'Sin número';
-          final rating = profile?['rating']?.toString() ?? '5.00';
-          final jobs = profile?['total_jobs']?.toString() ?? '0';
-          final avatarUrl = profile?['avatar_url']?.toString();
-          final city =
-              profile?['city']?.toString() ?? 'Ciudad no especificada';
-          final experience =
-              profile?['experience']?.toString() ?? 'Sin especificar';
-          final bank =
-              profile?['bank']?.toString() ?? 'Pendiente de registro';
-          final accountType = profile?['account_type']?.toString() ?? '';
-          final accountNumber = profile?['account_number']?.toString() ?? '';
-          final bio = profile?['bio']?.toString() ??
-              'Soy un profesional verificado en FIXIS, listo para brindar un servicio responsable y de calidad.';
-
-          var maskedAccount = '**** ****';
-          if (accountNumber.length >= 4) {
-            maskedAccount =
-                '•••• ${accountNumber.substring(accountNumber.length - 4)}';
-          }
-
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 36),
-            children: [
-              _buildIdentityHero(
-                name: name,
-                category: category,
-                rating: rating,
-                jobs: jobs,
-                avatarUrl: avatarUrl,
-              ),
-              const SizedBox(height: 18),
-              _buildLevelShortcut(context),
-              const SizedBox(height: 24),
-              FixisSectionHeader(
-                title: 'Sobre mí',
-                subtitle: 'La presentación que tus clientes verán',
-                trailing: IconButton(
-                  onPressed: user == null
-                      ? null
-                      : () => _showEditBioDialog(context, bio, user.id),
-                  icon: const Icon(Icons.edit_note_rounded),
-                  color: AppTheme.primaryBlue,
-                  tooltip: 'Editar biografía',
+          data: (profile) {
+            final name = profile?['full_name']?.toString() ?? 'Profesional FIXIS';
+            final category = profile?['category']?.toString() ?? 'Especialista';
+            final phone = profile?['phone']?.toString() ?? 'Sin número';
+            final rating = profile?['rating']?.toString() ?? '5.00';
+            final jobs = profile?['total_jobs']?.toString() ?? '0';
+            final avatarUrl = profile?['avatar_url']?.toString();
+            final city =
+                profile?['city']?.toString() ?? 'Ciudad no especificada';
+            final experience =
+                profile?['experience']?.toString() ?? 'Sin especificar';
+            final bank =
+                profile?['bank']?.toString() ?? 'Pendiente de registro';
+            final accountType = profile?['account_type']?.toString() ?? '';
+            final accountNumber = profile?['account_number']?.toString() ?? '';
+            final bio = profile?['bio']?.toString() ??
+                'Soy un profesional verificado en FIXIS, listo para brindar un servicio responsable y de calidad.';
+  
+            var maskedAccount = '**** ****';
+            if (accountNumber.length >= 4) {
+              maskedAccount =
+                  '•••• ${accountNumber.substring(accountNumber.length - 4)}';
+            }
+  
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 36),
+              children: [
+                _buildIdentityHero(
+                  name: name,
+                  category: category,
+                  rating: rating,
+                  jobs: jobs,
+                  avatarUrl: avatarUrl,
                 ),
-              ),
-              const SizedBox(height: 10),
-              FixisSurface(
-                shadows: const [],
-                border: Border.all(color: AppTheme.slate200),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(
-                      Icons.format_quote_rounded,
-                      color: AppTheme.primaryOrange,
-                      size: 28,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        bio,
-                        style: const TextStyle(
-                          color: AppTheme.slate700,
-                          height: 1.5,
-                          fontStyle: FontStyle.italic,
-                          fontSize: 14,
+                const SizedBox(height: 18),
+                _buildLevelShortcut(context),
+                const SizedBox(height: 24),
+                FixisSectionHeader(
+                  title: 'Sobre mí',
+                  subtitle: 'La presentación que tus clientes verán',
+                  trailing: IconButton(
+                    onPressed: user == null
+                        ? null
+                        : () => _showEditBioDialog(context, bio, user.id),
+                    icon: const Icon(Icons.edit_note_rounded),
+                    color: AppTheme.primaryBlue,
+                    tooltip: 'Editar biografía',
+                  ),
+                ),
+                const SizedBox(height: 10),
+                FixisSurface(
+                  shadows: const [],
+                  border: Border.all(color: AppTheme.slate200),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.format_quote_rounded,
+                        color: AppTheme.primaryOrange,
+                        size: 28,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          bio,
+                          style: const TextStyle(
+                            color: AppTheme.slate700,
+                            height: 1.5,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              const FixisSectionHeader(
-                title: 'Información profesional',
-                subtitle: 'Datos visibles de tu perfil FIXIS',
-              ),
-              const SizedBox(height: 10),
-              FixisSurface(
-                padding: EdgeInsets.zero,
-                shadows: const [],
-                border: Border.all(color: AppTheme.slate200),
-                child: Column(
-                  children: [
-                    _buildInfoTile(
-                      Icons.location_city_rounded,
-                      'Ciudad de operación',
-                      city,
-                      AppTheme.primaryBlue,
-                    ),
-                    const Divider(indent: 60),
-                    _buildInfoTile(
-                      Icons.work_history_rounded,
-                      'Experiencia',
-                      experience.contains('año')
-                          ? experience
-                          : '$experience años',
-                      AppTheme.primaryOrange,
-                    ),
-                  ],
+                const SizedBox(height: 24),
+                const FixisSectionHeader(
+                  title: 'Información profesional',
+                  subtitle: 'Datos visibles de tu perfil FIXIS',
                 ),
-              ),
-              const SizedBox(height: 24),
-              const FixisSectionHeader(
-                title: 'Cuenta de pago',
-                subtitle: 'Información privada para tus liquidaciones',
-              ),
-              const SizedBox(height: 10),
-              FixisSurface(
-                shadows: const [],
-                color: AppTheme.successSoft,
-                border: Border.all(
-                  color: AppTheme.success.withValues(alpha: 0.18),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppTheme.success.withValues(alpha: 0.10),
-                        borderRadius: BorderRadius.circular(15),
+                const SizedBox(height: 10),
+                FixisSurface(
+                  padding: EdgeInsets.zero,
+                  shadows: const [],
+                  border: Border.all(color: AppTheme.slate200),
+                  child: Column(
+                    children: [
+                      _buildInfoTile(
+                        Icons.location_city_rounded,
+                        'Ciudad de operación',
+                        city,
+                        AppTheme.primaryBlue,
                       ),
-                      child: const Icon(
-                        Icons.account_balance_rounded,
+                      const Divider(indent: 60),
+                      _buildInfoTile(
+                        Icons.work_history_rounded,
+                        'Experiencia',
+                        experience.contains('año')
+                            ? experience
+                            : '$experience años',
+                        AppTheme.primaryOrange,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const FixisSectionHeader(
+                  title: 'Cuenta de pago',
+                  subtitle: 'Información privada para tus liquidaciones',
+                ),
+                const SizedBox(height: 10),
+                FixisSurface(
+                  shadows: const [],
+                  color: AppTheme.successSoft,
+                  border: Border.all(
+                    color: AppTheme.success.withValues(alpha: 0.18),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppTheme.success.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: const Icon(
+                          Icons.account_balance_rounded,
+                          color: AppTheme.success,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              bank,
+                              style: const TextStyle(
+                                color: AppTheme.darkSlate,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              '$accountType · $maskedAccount',
+                              style: const TextStyle(
+                                color: AppTheme.slate500,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const FixisStatusPill(
+                        label: 'PRIVADO',
                         color: AppTheme.success,
+                        icon: Icons.lock_outline_rounded,
                       ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            bank,
-                            style: const TextStyle(
-                              color: AppTheme.darkSlate,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            '$accountType · $maskedAccount',
-                            style: const TextStyle(
-                              color: AppTheme.slate500,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const FixisStatusPill(
-                      label: 'PRIVADO',
-                      color: AppTheme.success,
-                      icon: Icons.lock_outline_rounded,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              const FixisSectionHeader(
-                title: 'Seguridad y cuenta',
-                subtitle: 'Datos asociados a tu acceso',
-              ),
-              const SizedBox(height: 10),
-              FixisSurface(
-                padding: EdgeInsets.zero,
-                shadows: const [],
-                border: Border.all(color: AppTheme.slate200),
-                child: Column(
-                  children: [
-                    _buildInfoTile(
-                      Icons.phone_outlined,
-                      'Teléfono registrado',
-                      phone,
-                      AppTheme.primaryBlue,
-                    ),
-                    const Divider(indent: 60),
-                    _buildInfoTile(
-                      Icons.email_outlined,
-                      'Correo electrónico',
-                      user?.email ?? 'correo no disponible',
-                      AppTheme.primaryOrange,
-                    ),
-                  ],
+                const SizedBox(height: 24),
+                const FixisSectionHeader(
+                  title: 'Seguridad y cuenta',
+                  subtitle: 'Datos asociados a tu acceso',
                 ),
-              ),
-              const SizedBox(height: 24),
-              const FixisSectionHeader(
-                title: 'Legal y soporte',
-                subtitle: 'Información y ayuda FIXIS',
-              ),
-              const SizedBox(height: 10),
-              FixisSurface(
-                padding: EdgeInsets.zero,
-                shadows: const [],
-                border: Border.all(color: AppTheme.slate200),
-                child: Column(
-                  children: [
-                    _buildActionTile(
-                      Icons.description_outlined,
-                      'Términos y condiciones',
-                      () => _launchURL(
-                        'https://fixis.geotactics.com.ec/terminos.html',
+                const SizedBox(height: 10),
+                FixisSurface(
+                  padding: EdgeInsets.zero,
+                  shadows: const [],
+                  border: Border.all(color: AppTheme.slate200),
+                  child: Column(
+                    children: [
+                      _buildInfoTile(
+                        Icons.phone_outlined,
+                        'Teléfono registrado',
+                        phone,
+                        AppTheme.primaryBlue,
                       ),
-                    ),
-                    const Divider(indent: 60),
-                    _buildActionTile(
-                      Icons.privacy_tip_outlined,
-                      'Política de privacidad',
-                      () => _launchURL(
-                        'https://fixis.geotactics.com.ec/privacidad.html',
+                      const Divider(indent: 60),
+                      _buildInfoTile(
+                        Icons.email_outlined,
+                        'Correo electrónico',
+                        user?.email ?? 'correo no disponible',
+                        AppTheme.primaryOrange,
                       ),
-                    ),
-                    const Divider(indent: 60),
-                    _buildActionTile(
-                      Icons.help_outline_rounded,
-                      'Centro de ayuda',
-                      () => _launchURL(
-                        'https://fixis.geotactics.com.ec/centro.html',
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              const FixisSectionHeader(
-                title: 'Cuenta',
-                subtitle: 'Sesión y administración de tu cuenta',
-              ),
-              const SizedBox(height: 10),
-              FixisSurface(
-                padding: EdgeInsets.zero,
-                shadows: const [],
-                border: Border.all(
-                  color: AppTheme.danger.withValues(alpha: 0.14),
+                const SizedBox(height: 24),
+                const FixisSectionHeader(
+                  title: 'Legal y soporte',
+                  subtitle: 'Información y ayuda FIXIS',
                 ),
-                child: Column(
-                  children: [
-                    ListTile(
-                      onTap: () async {
-                        await ref.read(authRepositoryProvider).signOut();
-                        if (context.mounted) {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                              builder: (_) => const LoginScreen(),
-                            ),
-                            (_) => false,
-                          );
-                        }
-                      },
-                      leading: _actionIcon(
-                        Icons.logout_rounded,
-                        AppTheme.warning,
-                      ),
-                      title: const Text(
-                        'Cerrar sesión',
-                        style: TextStyle(
-                          color: AppTheme.darkSlate,
-                          fontWeight: FontWeight.w800,
+                const SizedBox(height: 10),
+                FixisSurface(
+                  padding: EdgeInsets.zero,
+                  shadows: const [],
+                  border: Border.all(color: AppTheme.slate200),
+                  child: Column(
+                    children: [
+                      _buildActionTile(
+                        Icons.description_outlined,
+                        'Términos y condiciones',
+                        () => _launchURL(
+                          'https://fixis.geotactics.com.ec/terminos.html',
                         ),
                       ),
-                      trailing:
-                          const Icon(Icons.chevron_right_rounded),
-                    ),
-                    Divider(
-                      indent: 60,
-                      color: AppTheme.danger.withValues(alpha: 0.10),
-                    ),
-                    ListTile(
-                      onTap: () => _showDeleteAccountDialog(context),
-                      leading: _actionIcon(
-                        Icons.delete_forever_rounded,
-                        AppTheme.danger,
+                      const Divider(indent: 60),
+                      _buildActionTile(
+                        Icons.privacy_tip_outlined,
+                        'Política de privacidad',
+                        () => _launchURL(
+                          'https://fixis.geotactics.com.ec/privacidad.html',
+                        ),
                       ),
-                      title: const Text(
-                        'Eliminar mi cuenta',
-                        style: TextStyle(
+                      const Divider(indent: 60),
+                      _buildActionTile(
+                        Icons.help_outline_rounded,
+                        'Centro de ayuda',
+                        () => _launchURL(
+                          'https://fixis.geotactics.com.ec/centro.html',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const FixisSectionHeader(
+                  title: 'Cuenta',
+                  subtitle: 'Sesión y administración de tu cuenta',
+                ),
+                const SizedBox(height: 10),
+                FixisSurface(
+                  padding: EdgeInsets.zero,
+                  shadows: const [],
+                  border: Border.all(
+                    color: AppTheme.danger.withValues(alpha: 0.14),
+                  ),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        onTap: () async {
+                          await ref.read(authRepositoryProvider).signOut();
+                          if (context.mounted) {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder: (_) => const LoginScreen(),
+                              ),
+                              (_) => false,
+                            );
+                          }
+                        },
+                        leading: _actionIcon(
+                          Icons.logout_rounded,
+                          AppTheme.warning,
+                        ),
+                        title: const Text(
+                          'Cerrar sesión',
+                          style: TextStyle(
+                            color: AppTheme.darkSlate,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        trailing:
+                            const Icon(Icons.chevron_right_rounded),
+                      ),
+                      Divider(
+                        indent: 60,
+                        color: AppTheme.danger.withValues(alpha: 0.10),
+                      ),
+                      ListTile(
+                        onTap: () => _showDeleteAccountDialog(context),
+                        leading: _actionIcon(
+                          Icons.delete_forever_rounded,
+                          AppTheme.danger,
+                        ),
+                        title: const Text(
+                          'Eliminar mi cuenta',
+                          style: TextStyle(
+                            color: AppTheme.danger,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        trailing: const Icon(
+                          Icons.chevron_right_rounded,
                           color: AppTheme.danger,
-                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                      trailing: const Icon(
-                        Icons.chevron_right_rounded,
-                        color: AppTheme.danger,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }

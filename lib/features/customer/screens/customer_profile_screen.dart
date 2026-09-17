@@ -51,378 +51,382 @@ class _CustomerProfileScreenState
           ),
         ],
       ),
-      body: profileAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Text(
-              'No fue posible cargar tu perfil.\n$error',
-              textAlign: TextAlign.center,
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: profileAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                'No fue posible cargar tu perfil.\n$error',
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
-        ),
-        data: (profile) {
-          final name = profile?['full_name']?.toString().trim().isNotEmpty == true
-              ? profile!['full_name'].toString().trim()
-              : 'Cliente FIXIS';
-          final phone = profile?['phone']?.toString().trim() ?? '';
-          final city = profile?['city']?.toString().trim() ?? '';
-          final accountStatus =
-              profile?['account_status']?.toString() ?? 'active';
-          final createdAt =
-              DateTime.tryParse(profile?['created_at']?.toString() ?? '');
-          final avatarUrl = profile?['avatar_url']?.toString();
-
-          final jobs = jobsAsync.value ?? const <Map<String, dynamic>>[];
-          final completed = jobs.where((job) {
-            final status = job['status']?.toString();
-            return status == 'customer_approved' || status == 'completed';
-          }).length;
-          final active = jobs.where((job) {
-            final status = job['status']?.toString();
-            return status != 'customer_approved' &&
-                status != 'completed' &&
-                status != 'cancelled';
-          }).length;
-
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 36),
-            children: [
-              _IdentityHero(
-                name: name,
-                email: user?.email ?? 'Correo no disponible',
-                avatarUrl: avatarUrl,
-                isUploading: _isUploadingAvatar,
-                onAvatarTap: user == null
-                    ? null
-                    : () => _showAvatarSourceSheet(user.id),
-                activeJobs: active,
-                completedJobs: completed,
-              ),
-              const SizedBox(height: 24),
-              FixisSectionHeader(
-                title: 'Datos personales',
-                subtitle: 'Información de tu cuenta FIXIS',
-                trailing: IconButton(
-                  tooltip: 'Editar',
-                  onPressed: user == null
+          data: (profile) {
+            final name = profile?['full_name']?.toString().trim().isNotEmpty == true
+                ? profile!['full_name'].toString().trim()
+                : 'Cliente FIXIS';
+            final phone = profile?['phone']?.toString().trim() ?? '';
+            final city = profile?['city']?.toString().trim() ?? '';
+            final accountStatus =
+                profile?['account_status']?.toString() ?? 'active';
+            final createdAt =
+                DateTime.tryParse(profile?['created_at']?.toString() ?? '');
+            final avatarUrl = profile?['avatar_url']?.toString();
+  
+            final jobs = jobsAsync.value ?? const <Map<String, dynamic>>[];
+            final completed = jobs.where((job) {
+              final status = job['status']?.toString();
+              return status == 'customer_approved' || status == 'completed';
+            }).length;
+            final active = jobs.where((job) {
+              final status = job['status']?.toString();
+              return status != 'customer_approved' &&
+                  status != 'completed' &&
+                  status != 'cancelled';
+            }).length;
+  
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 36),
+              children: [
+                _IdentityHero(
+                  name: name,
+                  email: user?.email ?? 'Correo no disponible',
+                  avatarUrl: avatarUrl,
+                  isUploading: _isUploadingAvatar,
+                  onAvatarTap: user == null
                       ? null
-                      : () => _showEditProfileDialog(
-                            context,
-                            ref,
-                            user.id,
-                            name,
-                            phone,
-                            city,
-                          ),
-                  icon: const Icon(Icons.edit_rounded),
-                  color: AppTheme.primaryBlue,
+                      : () => _showAvatarSourceSheet(user.id),
+                  activeJobs: active,
+                  completedJobs: completed,
                 ),
-              ),
-              const SizedBox(height: 10),
-              FixisSurface(
-                padding: EdgeInsets.zero,
-                shadows: const [],
-                border: Border.all(color: AppTheme.slate200),
-                child: Column(
-                  children: [
-                    _InfoTile(
-                      icon: Icons.person_outline_rounded,
-                      title: 'Nombre',
-                      value: name,
-                      color: AppTheme.primaryBlue,
-                    ),
-                    const Divider(indent: 60),
-                    _InfoTile(
-                      icon: Icons.phone_outlined,
-                      title: 'Teléfono',
-                      value: phone.isEmpty ? 'No registrado' : phone,
-                      color: AppTheme.primaryOrange,
-                    ),
-                    const Divider(indent: 60),
-                    _InfoTile(
-                      icon: Icons.location_city_outlined,
-                      title: 'Ciudad',
-                      value: city.isEmpty ? 'No registrada' : city,
-                      color: AppTheme.primaryBlue,
-                    ),
-                    const Divider(indent: 60),
-                    _InfoTile(
-                      icon: Icons.email_outlined,
-                      title: 'Correo',
-                      value: user?.email ?? 'No disponible',
-                      color: AppTheme.primaryOrange,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              const FixisSectionHeader(
-                title: 'Tu actividad',
-                subtitle: 'Resumen real de tus servicios FIXIS',
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: _MetricCard(
-                      icon: Icons.handyman_rounded,
-                      value: '$active',
-                      label: 'Activos',
-                      color: AppTheme.primaryBlue,
-                    ),
+                const SizedBox(height: 24),
+                FixisSectionHeader(
+                  title: 'Datos personales',
+                  subtitle: 'Información de tu cuenta FIXIS',
+                  trailing: IconButton(
+                    tooltip: 'Editar',
+                    onPressed: user == null
+                        ? null
+                        : () => _showEditProfileDialog(
+                              context,
+                              ref,
+                              user.id,
+                              name,
+                              phone,
+                              city,
+                            ),
+                    icon: const Icon(Icons.edit_rounded),
+                    color: AppTheme.primaryBlue,
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _MetricCard(
-                      icon: Icons.verified_rounded,
-                      value: '$completed',
-                      label: 'Completados',
-                      color: AppTheme.success,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              const FixisSectionHeader(
-                title: 'Cuenta',
-                subtitle: 'Estado y antigüedad de tu registro',
-              ),
-              const SizedBox(height: 10),
-              FixisSurface(
-                shadows: const [],
-                color: AppTheme.blueSoft,
-                border: Border.all(
-                  color: AppTheme.primaryBlue.withValues(alpha: 0.14),
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 46,
-                      height: 46,
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryBlue.withValues(alpha: 0.09),
-                        borderRadius: BorderRadius.circular(14),
+                const SizedBox(height: 10),
+                FixisSurface(
+                  padding: EdgeInsets.zero,
+                  shadows: const [],
+                  border: Border.all(color: AppTheme.slate200),
+                  child: Column(
+                    children: [
+                      _InfoTile(
+                        icon: Icons.person_outline_rounded,
+                        title: 'Nombre',
+                        value: name,
+                        color: AppTheme.primaryBlue,
                       ),
-                      child: const Icon(
-                        Icons.shield_outlined,
+                      const Divider(indent: 60),
+                      _InfoTile(
+                        icon: Icons.phone_outlined,
+                        title: 'Teléfono',
+                        value: phone.isEmpty ? 'No registrado' : phone,
+                        color: AppTheme.primaryOrange,
+                      ),
+                      const Divider(indent: 60),
+                      _InfoTile(
+                        icon: Icons.location_city_outlined,
+                        title: 'Ciudad',
+                        value: city.isEmpty ? 'No registrada' : city,
+                        color: AppTheme.primaryBlue,
+                      ),
+                      const Divider(indent: 60),
+                      _InfoTile(
+                        icon: Icons.email_outlined,
+                        title: 'Correo',
+                        value: user?.email ?? 'No disponible',
+                        color: AppTheme.primaryOrange,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const FixisSectionHeader(
+                  title: 'Tu actividad',
+                  subtitle: 'Resumen real de tus servicios FIXIS',
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _MetricCard(
+                        icon: Icons.handyman_rounded,
+                        value: '$active',
+                        label: 'Activos',
                         color: AppTheme.primaryBlue,
                       ),
                     ),
-                    const SizedBox(width: 13),
+                    const SizedBox(width: 10),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Cuenta FIXIS',
-                            style: TextStyle(
-                              color: AppTheme.darkSlate,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            createdAt == null
-                                ? 'Estado: $accountStatus'
-                                : 'Desde ${_formatDate(createdAt)} · $accountStatus',
-                            style: const TextStyle(
-                              color: AppTheme.slate500,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
+                      child: _MetricCard(
+                        icon: Icons.verified_rounded,
+                        value: '$completed',
+                        label: 'Completados',
+                        color: AppTheme.success,
                       ),
-                    ),
-                    FixisStatusPill(
-                      label: accountStatus.toUpperCase(),
-                      color: accountStatus == 'active'
-                          ? AppTheme.success
-                          : AppTheme.warning,
-                      icon: Icons.verified_user_rounded,
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 24),
-              const FixisSectionHeader(
-                title: 'Fidelización FIXIS',
-                subtitle: 'Base preparada para campañas y beneficios',
-              ),
-              const SizedBox(height: 10),
-              FixisSurface(
-                shadows: const [],
-                border: Border.all(color: AppTheme.slate200),
-                child: const Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.card_giftcard_rounded,
-                      color: AppTheme.primaryOrange,
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Tu perfil ya queda preparado para futuras campañas, beneficios y segmentación. Los puntos o recompensas se activarán únicamente cuando exista una regla real en el sistema.',
-                        style: TextStyle(
-                          color: AppTheme.slate700,
-                          height: 1.45,
+                const SizedBox(height: 24),
+                const FixisSectionHeader(
+                  title: 'Cuenta',
+                  subtitle: 'Estado y antigüedad de tu registro',
+                ),
+                const SizedBox(height: 10),
+                FixisSurface(
+                  shadows: const [],
+                  color: AppTheme.blueSoft,
+                  border: Border.all(
+                    color: AppTheme.primaryBlue.withValues(alpha: 0.14),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 46,
+                        height: 46,
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryBlue.withValues(alpha: 0.09),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: const Icon(
+                          Icons.shield_outlined,
+                          color: AppTheme.primaryBlue,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              const FixisSectionHeader(
-                title: 'Legal y soporte',
-                subtitle: 'Ayuda e información de FIXIS',
-              ),
-              const SizedBox(height: 10),
-              FixisSurface(
-                padding: EdgeInsets.zero,
-                shadows: const [],
-                border: Border.all(color: AppTheme.slate200),
-                child: Column(
-                  children: [
-                    _ActionTile(
-                      icon: Icons.description_outlined,
-                      title: 'Términos y condiciones',
-                      onTap: () => _launch(
-                        context,
-                        'https://fixis.geotactics.com.ec/terminos.html',
-                      ),
-                    ),
-                    const Divider(indent: 60),
-                    _ActionTile(
-                      icon: Icons.privacy_tip_outlined,
-                      title: 'Política de privacidad',
-                      onTap: () => _launch(
-                        context,
-                        'https://fixis.geotactics.com.ec/privacidad.html',
-                      ),
-                    ),
-                    const Divider(indent: 60),
-                    _ActionTile(
-                      icon: Icons.help_outline_rounded,
-                      title: 'Centro de ayuda',
-                      onTap: () => _launch(
-                        context,
-                        'https://fixis.geotactics.com.ec/centro.html',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              const FixisSectionHeader(
-                title: 'Sesión',
-                subtitle: 'Acceso a tu cuenta',
-              ),
-              const SizedBox(height: 10),
-              FixisSurface(
-                padding: EdgeInsets.zero,
-                shadows: const [],
-                border: Border.all(color: AppTheme.slate200),
-                child: ListTile(
-                  onTap: () async {
-                    await ref.read(authRepositoryProvider).signOut();
-                    if (context.mounted) {
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (_) => const LoginScreen(),
+                      const SizedBox(width: 13),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Cuenta FIXIS',
+                              style: TextStyle(
+                                color: AppTheme.darkSlate,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              createdAt == null
+                                  ? 'Estado: $accountStatus'
+                                  : 'Desde ${_formatDate(createdAt)} · $accountStatus',
+                              style: const TextStyle(
+                                color: AppTheme.slate500,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
-                        (_) => false,
-                      );
-                    }
-                  },
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 6,
-                  ),
-                  leading: Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: AppTheme.warning.withValues(alpha: 0.09),
-                      borderRadius: BorderRadius.circular(13),
-                    ),
-                    child: const Icon(
-                      Icons.logout_rounded,
-                      color: AppTheme.warning,
-                    ),
-                  ),
-                  title: const Text(
-                    'Cerrar sesión',
-                    style: TextStyle(
-                      color: AppTheme.darkSlate,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  trailing: const Icon(
-                    Icons.chevron_right_rounded,
-                    color: AppTheme.slate500,
+                      ),
+                      FixisStatusPill(
+                        label: accountStatus.toUpperCase(),
+                        color: accountStatus == 'active'
+                            ? AppTheme.success
+                            : AppTheme.warning,
+                        icon: Icons.verified_user_rounded,
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              const FixisSectionHeader(
-                title: 'Eliminar cuenta',
-                subtitle: 'Control permanente de tus datos y acceso',
-              ),
-              const SizedBox(height: 10),
-              FixisSurface(
-                padding: EdgeInsets.zero,
-                shadows: const [],
-                border: Border.all(
-                  color: AppTheme.danger.withValues(alpha: 0.20),
+                const SizedBox(height: 24),
+                const FixisSectionHeader(
+                  title: 'Fidelización FIXIS',
+                  subtitle: 'Base preparada para campañas y beneficios',
                 ),
-                child: ListTile(
-                  onTap: () => _showDeleteAccountDialog(context, ref),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+                const SizedBox(height: 10),
+                FixisSurface(
+                  shadows: const [],
+                  border: Border.all(color: AppTheme.slate200),
+                  child: const Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.card_giftcard_rounded,
+                        color: AppTheme.primaryOrange,
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Tu perfil ya queda preparado para futuras campañas, beneficios y segmentación. Los puntos o recompensas se activarán únicamente cuando exista una regla real en el sistema.',
+                          style: TextStyle(
+                            color: AppTheme.slate700,
+                            height: 1.45,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  leading: Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: AppTheme.danger.withValues(alpha: 0.09),
-                      borderRadius: BorderRadius.circular(13),
-                    ),
-                    child: const Icon(
-                      Icons.delete_forever_rounded,
-                      color: AppTheme.danger,
-                    ),
+                ),
+                const SizedBox(height: 24),
+                const FixisSectionHeader(
+                  title: 'Legal y soporte',
+                  subtitle: 'Ayuda e información de FIXIS',
+                ),
+                const SizedBox(height: 10),
+                FixisSurface(
+                  padding: EdgeInsets.zero,
+                  shadows: const [],
+                  border: Border.all(color: AppTheme.slate200),
+                  child: Column(
+                    children: [
+                      _ActionTile(
+                        icon: Icons.description_outlined,
+                        title: 'Términos y condiciones',
+                        onTap: () => _launch(
+                          context,
+                          'https://fixis.geotactics.com.ec/terminos.html',
+                        ),
+                      ),
+                      const Divider(indent: 60),
+                      _ActionTile(
+                        icon: Icons.privacy_tip_outlined,
+                        title: 'Política de privacidad',
+                        onTap: () => _launch(
+                          context,
+                          'https://fixis.geotactics.com.ec/privacidad.html',
+                        ),
+                      ),
+                      const Divider(indent: 60),
+                      _ActionTile(
+                        icon: Icons.help_outline_rounded,
+                        title: 'Centro de ayuda',
+                        onTap: () => _launch(
+                          context,
+                          'https://fixis.geotactics.com.ec/centro.html',
+                        ),
+                      ),
+                    ],
                   ),
-                  title: const Text(
-                    'Eliminar mi cuenta',
-                    style: TextStyle(
-                      color: AppTheme.danger,
-                      fontWeight: FontWeight.w900,
+                ),
+                const SizedBox(height: 24),
+                const FixisSectionHeader(
+                  title: 'Sesión',
+                  subtitle: 'Acceso a tu cuenta',
+                ),
+                const SizedBox(height: 10),
+                FixisSurface(
+                  padding: EdgeInsets.zero,
+                  shadows: const [],
+                  border: Border.all(color: AppTheme.slate200),
+                  child: ListTile(
+                    onTap: () async {
+                      await ref.read(authRepositoryProvider).signOut();
+                      if (context.mounted) {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (_) => const LoginScreen(),
+                          ),
+                          (_) => false,
+                        );
+                      }
+                    },
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 6,
                     ),
-                  ),
-                  subtitle: const Padding(
-                    padding: EdgeInsets.only(top: 3),
-                    child: Text(
-                      'Elimina permanentemente tu cuenta FIXIS y los datos asociados que no debamos conservar legalmente.',
+                    leading: Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: AppTheme.warning.withValues(alpha: 0.09),
+                        borderRadius: BorderRadius.circular(13),
+                      ),
+                      child: const Icon(
+                        Icons.logout_rounded,
+                        color: AppTheme.warning,
+                      ),
+                    ),
+                    title: const Text(
+                      'Cerrar sesión',
                       style: TextStyle(
-                        color: AppTheme.slate500,
-                        fontSize: 11.5,
-                        height: 1.35,
+                        color: AppTheme.darkSlate,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
-                  ),
-                  trailing: const Icon(
-                    Icons.chevron_right_rounded,
-                    color: AppTheme.danger,
+                    trailing: const Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppTheme.slate500,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
+                const SizedBox(height: 24),
+                const FixisSectionHeader(
+                  title: 'Eliminar cuenta',
+                  subtitle: 'Control permanente de tus datos y acceso',
+                ),
+                const SizedBox(height: 10),
+                FixisSurface(
+                  padding: EdgeInsets.zero,
+                  shadows: const [],
+                  border: Border.all(
+                    color: AppTheme.danger.withValues(alpha: 0.20),
+                  ),
+                  child: ListTile(
+                    onTap: () => _showDeleteAccountDialog(context, ref),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    leading: Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: AppTheme.danger.withValues(alpha: 0.09),
+                        borderRadius: BorderRadius.circular(13),
+                      ),
+                      child: const Icon(
+                        Icons.delete_forever_rounded,
+                        color: AppTheme.danger,
+                      ),
+                    ),
+                    title: const Text(
+                      'Eliminar mi cuenta',
+                      style: TextStyle(
+                        color: AppTheme.danger,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    subtitle: const Padding(
+                      padding: EdgeInsets.only(top: 3),
+                      child: Text(
+                        'Elimina permanentemente tu cuenta FIXIS y los datos asociados que no debamos conservar legalmente.',
+                        style: TextStyle(
+                          color: AppTheme.slate500,
+                          fontSize: 11.5,
+                          height: 1.35,
+                        ),
+                      ),
+                    ),
+                    trailing: const Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppTheme.danger,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

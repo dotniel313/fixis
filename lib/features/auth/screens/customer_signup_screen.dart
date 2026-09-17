@@ -135,38 +135,42 @@ class _CustomerSignupScreenState extends ConsumerState<CustomerSignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Crear cuenta cliente')),
-      body: ListView(
-        padding: const EdgeInsets.all(24),
-        children: [
-          const Icon(Icons.home_repair_service, size: 58, color: AppTheme.primaryOrange),
-          const SizedBox(height: 18),
-          Text(_sent ? 'Verifica tu correo' : 'Únete a FIXIS', textAlign: TextAlign.center, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 8),
-          Text(_sent ? 'Ingresa el código enviado a ${_email.text.trim()}.' : 'Crea tu cuenta para solicitar y administrar servicios.', textAlign: TextAlign.center, style: const TextStyle(color: Colors.black54)),
-          const SizedBox(height: 28),
-          if (!_sent) ...[
-            TextField(controller: _name, decoration: const InputDecoration(labelText: 'Nombre completo')),
-            const SizedBox(height: 14),
-            TextField(controller: _phone, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Teléfono (opcional)')),
-            const SizedBox(height: 14),
-            TextField(controller: _email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Correo electrónico')),
-            const SizedBox(height: 24),
-            FilledButton(onPressed: _loading ? null : _send, child: const Text('Enviar código')),
-          ] else ...[
-            TextField(controller: _code, keyboardType: TextInputType.number, maxLength: 6, textAlign: TextAlign.center, decoration: const InputDecoration(labelText: 'Código', counterText: '')),
-            const SizedBox(height: 20),
-            FilledButton(onPressed: _loading ? null : _verify, child: const Text('Crear cuenta y entrar')),
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: ListView(
+          padding: const EdgeInsets.all(24),
+          children: [
+            const Icon(Icons.home_repair_service, size: 58, color: AppTheme.primaryOrange),
+            const SizedBox(height: 18),
+            Text(_sent ? 'Verifica tu correo' : 'Únete a FIXIS', textAlign: TextAlign.center, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800)),
             const SizedBox(height: 8),
-            TextButton(
-              onPressed: (_loading || _resendSeconds > 0) ? null : _resend,
-              child: Text(
-                _resendSeconds > 0
-                    ? 'Reenviar código en 00:${_resendSeconds.toString().padLeft(2, '0')}'
-                    : 'Reenviar código',
+            Text(_sent ? 'Ingresa el código enviado a ${_email.text.trim()}.' : 'Crea tu cuenta para solicitar y administrar servicios.', textAlign: TextAlign.center, style: const TextStyle(color: Colors.black54)),
+            const SizedBox(height: 28),
+            if (!_sent) ...[
+              TextField(controller: _name, decoration: const InputDecoration(labelText: 'Nombre completo')),
+              const SizedBox(height: 14),
+              TextField(controller: _phone, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Teléfono (opcional)')),
+              const SizedBox(height: 14),
+              TextField(controller: _email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Correo electrónico')),
+              const SizedBox(height: 24),
+              FilledButton(onPressed: _loading ? null : _send, child: const Text('Enviar código')),
+            ] else ...[
+              TextField(controller: _code, keyboardType: TextInputType.number, maxLength: 6, textAlign: TextAlign.center, decoration: const InputDecoration(labelText: 'Código', counterText: '')),
+              const SizedBox(height: 20),
+              FilledButton(onPressed: _loading ? null : _verify, child: const Text('Crear cuenta y entrar')),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: (_loading || _resendSeconds > 0) ? null : _resend,
+                child: Text(
+                  _resendSeconds > 0
+                      ? 'Reenviar código en 00:${_resendSeconds.toString().padLeft(2, '0')}'
+                      : 'Reenviar código',
+                ),
               ),
-            ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

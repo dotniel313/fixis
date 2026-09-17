@@ -41,147 +41,151 @@ class CustomerHomeScreen extends ConsumerWidget {
           ),
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async => ref.refresh(myCustomerJobsProvider.future),
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 110),
-          children: [
-            _CustomerHero(
-              firstName: firstName,
-              avatarUrl: avatarUrl,
-              onProfile: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const CustomerProfileScreen(),
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: RefreshIndicator(
+          onRefresh: () async => ref.refresh(myCustomerJobsProvider.future),
+          child: ListView(
+            padding: const EdgeInsets.only(bottom: 110),
+            children: [
+              _CustomerHero(
+                firstName: firstName,
+                avatarUrl: avatarUrl,
+                onProfile: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const CustomerProfileScreen(),
+                  ),
                 ),
+                onCreate: () async {
+                  final created = await Navigator.of(context).push<bool>(
+                    MaterialPageRoute(builder: (_) => const CreateJobScreen()),
+                  );
+                  if (created == true) {
+                    ref.invalidate(myCustomerJobsProvider);
+                  }
+                },
               ),
-              onCreate: () async {
-                final created = await Navigator.of(context).push<bool>(
-                  MaterialPageRoute(builder: (_) => const CreateJobScreen()),
-                );
-                if (created == true) {
-                  ref.invalidate(myCustomerJobsProvider);
-                }
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
-              child: jobsAsync.when(
-                loading: () => const Padding(
-                  padding: EdgeInsets.all(36),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-                error: (e, _) => const _InfoCard(
-                  icon: Icons.cloud_off_rounded,
-                  title: 'No pudimos cargar tus servicios',
-                  subtitle: 'Desliza para actualizar o inténtalo nuevamente.',
-                  color: AppTheme.danger,
-                ),
-                data: (jobs) {
-                  if (jobs.isEmpty) {
-                    return const Column(
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
+                child: jobsAsync.when(
+                  loading: () => const Padding(
+                    padding: EdgeInsets.all(36),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                  error: (e, _) => const _InfoCard(
+                    icon: Icons.cloud_off_rounded,
+                    title: 'No pudimos cargar tus servicios',
+                    subtitle: 'Desliza para actualizar o inténtalo nuevamente.',
+                    color: AppTheme.danger,
+                  ),
+                  data: (jobs) {
+                    if (jobs.isEmpty) {
+                      return const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          FixisSectionHeader(
+                            title: 'Tus servicios',
+                            subtitle: 'Todo comienza con tu primera solicitud',
+                          ),
+                          SizedBox(height: 12),
+                          _InfoCard(
+                            icon: Icons.home_repair_service_outlined,
+                            title: 'Aún no tienes solicitudes',
+                            subtitle:
+                                'Cuéntanos qué necesitas y FIXIS buscará profesionales cercanos.',
+                            color: AppTheme.primaryOrange,
+                          ),
+                        ],
+                      );
+                    }
+  
+                    const historicalStatuses = <String>{
+                      'customer_approved',
+                      'completed',
+                      'cancelled',
+                    };
+  
+                    final activeJobs = jobs
+                        .where(
+                          (job) => !historicalStatuses.contains(
+                            job['status']?.toString(),
+                          ),
+                        )
+                        .toList(growable: false);
+  
+                    final historyJobs = jobs
+                        .where(
+                          (job) => historicalStatuses.contains(
+                            job['status']?.toString(),
+                          ),
+                        )
+                        .toList(growable: false);
+  
+                    Widget buildJobCard(Map<String, dynamic> job) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: _JobCard(
+                          job: job,
+                          onTap: () async {
+                            await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => CustomerJobDetailScreen(
+                                  jobId: job['id'].toString(),
+                                ),
+                              ),
+                            );
+                            ref.invalidate(myCustomerJobsProvider);
+                          },
+                        ),
+                      );
+                    }
+  
+                    return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         FixisSectionHeader(
-                          title: 'Tus servicios',
-                          subtitle: 'Todo comienza con tu primera solicitud',
-                        ),
-                        SizedBox(height: 12),
-                        _InfoCard(
-                          icon: Icons.home_repair_service_outlined,
-                          title: 'Aún no tienes solicitudes',
-                          subtitle:
-                              'Cuéntanos qué necesitas y FIXIS buscará profesionales cercanos.',
-                          color: AppTheme.primaryOrange,
-                        ),
-                      ],
-                    );
-                  }
-
-                  const historicalStatuses = <String>{
-                    'customer_approved',
-                    'completed',
-                    'cancelled',
-                  };
-
-                  final activeJobs = jobs
-                      .where(
-                        (job) => !historicalStatuses.contains(
-                          job['status']?.toString(),
-                        ),
-                      )
-                      .toList(growable: false);
-
-                  final historyJobs = jobs
-                      .where(
-                        (job) => historicalStatuses.contains(
-                          job['status']?.toString(),
-                        ),
-                      )
-                      .toList(growable: false);
-
-                  Widget buildJobCard(Map<String, dynamic> job) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: _JobCard(
-                        job: job,
-                        onTap: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => CustomerJobDetailScreen(
-                                jobId: job['id'].toString(),
-                              ),
-                            ),
-                          );
-                          ref.invalidate(myCustomerJobsProvider);
-                        },
-                      ),
-                    );
-                  }
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FixisSectionHeader(
-                        title: 'Servicios activos',
-                        subtitle: activeJobs.isEmpty
-                            ? 'No tienes servicios en curso'
-                            : '${activeJobs.length} ${activeJobs.length == 1 ? 'servicio en curso' : 'servicios en curso'}',
-                        trailing: FixisStatusPill(
-                          label: activeJobs.isEmpty ? 'AL DÍA' : 'ACTIVOS',
-                          color: activeJobs.isEmpty
-                              ? AppTheme.success
-                              : AppTheme.primaryBlue,
-                          icon: activeJobs.isEmpty
-                              ? Icons.check_circle_rounded
-                              : Icons.bolt_rounded,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      if (activeJobs.isEmpty)
-                        const _InfoCard(
-                          icon: Icons.check_circle_outline_rounded,
-                          title: 'Todo al día',
-                          subtitle:
-                              'Cuando solicites un servicio, podrás seguirlo aquí en tiempo real.',
-                          color: AppTheme.success,
-                        )
-                      else
-                        ...activeJobs.map(buildJobCard),
-                      if (historyJobs.isNotEmpty) ...[
-                        const SizedBox(height: 24),
-                        const FixisSectionHeader(
-                          title: 'Historial',
-                          subtitle: 'Servicios finalizados y cancelados',
+                          title: 'Servicios activos',
+                          subtitle: activeJobs.isEmpty
+                              ? 'No tienes servicios en curso'
+                              : '${activeJobs.length} ${activeJobs.length == 1 ? 'servicio en curso' : 'servicios en curso'}',
+                          trailing: FixisStatusPill(
+                            label: activeJobs.isEmpty ? 'AL DÍA' : 'ACTIVOS',
+                            color: activeJobs.isEmpty
+                                ? AppTheme.success
+                                : AppTheme.primaryBlue,
+                            icon: activeJobs.isEmpty
+                                ? Icons.check_circle_rounded
+                                : Icons.bolt_rounded,
+                          ),
                         ),
                         const SizedBox(height: 12),
-                        ...historyJobs.map(buildJobCard),
+                        if (activeJobs.isEmpty)
+                          const _InfoCard(
+                            icon: Icons.check_circle_outline_rounded,
+                            title: 'Todo al día',
+                            subtitle:
+                                'Cuando solicites un servicio, podrás seguirlo aquí en tiempo real.',
+                            color: AppTheme.success,
+                          )
+                        else
+                          ...activeJobs.map(buildJobCard),
+                        if (historyJobs.isNotEmpty) ...[
+                          const SizedBox(height: 24),
+                          const FixisSectionHeader(
+                            title: 'Historial',
+                            subtitle: 'Servicios finalizados y cancelados',
+                          ),
+                          const SizedBox(height: 12),
+                          ...historyJobs.map(buildJobCard),
+                        ],
                       ],
-                    ],
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

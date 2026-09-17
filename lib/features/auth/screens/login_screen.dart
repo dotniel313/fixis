@@ -181,6 +181,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
+        minimum: const EdgeInsets.only(bottom: 12),
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(

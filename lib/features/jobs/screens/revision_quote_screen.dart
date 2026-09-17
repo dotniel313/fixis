@@ -111,6 +111,8 @@ class _RevisionQuoteScreenState extends ConsumerState<RevisionQuoteScreen> {
       backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(title: const Text('Revisar cotización')),
       body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [

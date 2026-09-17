@@ -25,7 +25,7 @@ class AdminAccountScreen extends ConsumerWidget {
       ),
       body: SafeArea(
         top: false,
-        minimum: const EdgeInsets.fromLTRB(6, 0, 6, 8),
+        minimum: const EdgeInsets.only(bottom: 12),
         child: profileAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, _) => Center(

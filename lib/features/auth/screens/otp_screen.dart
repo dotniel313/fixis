@@ -65,6 +65,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
         iconTheme: const IconThemeData(color: AppTheme.darkSlate),
       ),
       body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(

@@ -19,6 +19,7 @@ class JobSuccessScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
+        minimum: const EdgeInsets.only(bottom: 12),
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(

@@ -164,33 +164,41 @@ class _CustomerPaymentScreenState
     if (_loading) {
       return Scaffold(
         appBar: AppBar(title: const Text('Aprobar y pagar')),
-        body: const Center(child: CircularProgressIndicator()),
+        body: SafeArea(
+          top: false,
+          minimum: const EdgeInsets.only(bottom: 12),
+          child: const Center(child: CircularProgressIndicator()),
+        ),
       );
     }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Aprobar y pagar')),
-      body: RefreshIndicator(
-        onRefresh: _load,
-        child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            _summaryCard(),
-            const SizedBox(height: 16),
-            if (_error != null) ...[
-              _noticeCard(
-                title: 'No pudimos cargar todo',
-                text: _error!,
-                icon: Icons.error_outline,
-                color: Colors.red,
-              ),
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: RefreshIndicator(
+          onRefresh: _load,
+          child: ListView(
+            padding: const EdgeInsets.all(20),
+            children: [
+              _summaryCard(),
               const SizedBox(height: 16),
+              if (_error != null) ...[
+                _noticeCard(
+                  title: 'No pudimos cargar todo',
+                  text: _error!,
+                  icon: Icons.error_outline,
+                  color: Colors.red,
+                ),
+                const SizedBox(height: 16),
+              ],
+              if (_payment == null)
+                _methodSelection()
+              else
+                _paymentFlow(),
             ],
-            if (_payment == null)
-              _methodSelection()
-            else
-              _paymentFlow(),
-          ],
+          ),
         ),
       ),
     );

@@ -36,52 +36,56 @@ class NotificationsScreen extends ConsumerWidget {
             ),
         ],
       ),
-      body: notificationsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => _ErrorState(
-          onRetry: () => ref.invalidate(myNotificationsStreamProvider),
-        ),
-        data: (items) {
-          if (items.isEmpty) {
-            return const _EmptyState();
-          }
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              ref.invalidate(myNotificationsStreamProvider);
-            },
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-              children: [
-                _NotificationsHero(
-                  unread: unread,
-                  total: items.length,
-                ),
-                const SizedBox(height: 20),
-                const FixisSectionHeader(
-                  title: 'Actividad reciente',
-                  subtitle: 'Pagos y liquidaciones en tiempo real',
-                ),
-                const SizedBox(height: 12),
-                ...items.map(
-                  (notification) => Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: _NotificationCard(
-                      notification: notification,
-                      onTap: () async {
-                        if (notification['read_at'] == null) {
-                          await ref
-                              .read(notificationsRepositoryProvider)
-                              .markAsRead(notification['id'].toString());
-                        }
-                      },
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: notificationsAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (_, __) => _ErrorState(
+            onRetry: () => ref.invalidate(myNotificationsStreamProvider),
+          ),
+          data: (items) {
+            if (items.isEmpty) {
+              return const _EmptyState();
+            }
+  
+            return RefreshIndicator(
+              onRefresh: () async {
+                ref.invalidate(myNotificationsStreamProvider);
+              },
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                children: [
+                  _NotificationsHero(
+                    unread: unread,
+                    total: items.length,
+                  ),
+                  const SizedBox(height: 20),
+                  const FixisSectionHeader(
+                    title: 'Actividad reciente',
+                    subtitle: 'Pagos y liquidaciones en tiempo real',
+                  ),
+                  const SizedBox(height: 12),
+                  ...items.map(
+                    (notification) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: _NotificationCard(
+                        notification: notification,
+                        onTap: () async {
+                          if (notification['read_at'] == null) {
+                            await ref
+                                .read(notificationsRepositoryProvider)
+                                .markAsRead(notification['id'].toString());
+                          }
+                        },
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

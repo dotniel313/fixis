@@ -58,8 +58,12 @@ class _AccessLoadingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: AppTheme.primaryOrange,
-      body: Center(
-        child: CircularProgressIndicator(color: Colors.white),
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
       ),
     );
   }

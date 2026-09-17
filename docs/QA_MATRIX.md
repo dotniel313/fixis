@@ -26,6 +26,7 @@ Ultima actualizacion: 2026-09-17
 | Revised Quote Flow | PENDING | E2E llego hasta aceptacion de revision; continuar tras hotfix |
 | Quote Revision Realtime | PENDING | Migracion 031 y suscripcion Flutter preparadas; falta aplicar y validar |
 | Revision Notification FIXI | PENDING | Evento persistente e in-app preparado; falta QA fisico |
+| Cross-device Safe Areas | PENDING | 23 pantallas auditadas; validar Redmi Note 12, iPhone 15 y iPhone 15 Pro |
 | Finance Regression | PENDING | quote -> snapshot -> payment -> ledger -> settlement |
 | Security Regression | PENDING | Validar RLS y RPC despues del E2E |
 

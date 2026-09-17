@@ -44,133 +44,137 @@ class GamificationScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: gamiAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const _LoadErrorState(),
-        data: (data) {
-          if (data == null) {
-            return const _EmptyGamificationState();
-          }
-
-          final rankValue = data['current_rank']?.toString().trim();
-          final rank =
-              (rankValue == null || rankValue.isEmpty) ? 'Inicial' : rankValue;
-
-          final completed =
-              (data['completed_jobs_count'] as num?)?.toInt() ?? 0;
-          final target = (data['target_jobs_count'] as num?)?.toInt();
-          final validTarget = target != null && target > 0 ? target : null;
-
-          final progress = validTarget == null
-              ? null
-              : (completed / validTarget).clamp(0.0, 1.0).toDouble();
-
-          final remaining = validTarget == null
-              ? null
-              : (validTarget - completed).clamp(0, validTarget);
-
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-            children: [
-              _buildHero(
-                rank: rank,
-                completed: completed,
-                target: validTarget,
-                progress: progress,
-              ),
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: _MetricCard(
-                      label: 'Confirmados',
-                      value: '$completed',
-                      icon: Icons.task_alt_rounded,
-                      color: AppTheme.success,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _MetricCard(
-                      label: validTarget == null
-                          ? 'Meta'
-                          : 'Para meta',
-                      value: validTarget == null
-                          ? '—'
-                          : '${remaining ?? 0}',
-                      icon: Icons.flag_rounded,
-                      color: AppTheme.primaryBlue,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              const FixisSectionHeader(
-                title: 'Cómo crece tu nivel',
-                subtitle: 'Solo usamos datos confirmados del sistema',
-              ),
-              const SizedBox(height: 10),
-              FixisSurface(
-                shadows: const [],
-                border: Border.all(color: AppTheme.slate200),
-                child: const Column(
-                  children: [
-                    _ProgressRule(
-                      icon: Icons.check_circle_rounded,
-                      color: AppTheme.success,
-                      title: 'Servicios aprobados',
-                      text:
-                          'Tu progreso aumenta cuando el cliente confirma el servicio.',
-                    ),
-                    SizedBox(height: 18),
-                    _ProgressRule(
-                      icon: Icons.shield_rounded,
-                      color: AppTheme.primaryBlue,
-                      title: 'Progreso respaldado',
-                      text:
-                          'Los rangos mostrados provienen de expert_gamification.',
-                    ),
-                    SizedBox(height: 18),
-                    _ProgressRule(
-                      icon: Icons.emoji_events_rounded,
-                      color: AppTheme.warning,
-                      title: 'Beneficios futuros',
-                      text:
-                          'Las insignias y beneficios aparecerán cuando existan reglas reales definidas.',
-                    ),
-                  ],
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: gamiAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (_, __) => const _LoadErrorState(),
+          data: (data) {
+            if (data == null) {
+              return const _EmptyGamificationState();
+            }
+  
+            final rankValue = data['current_rank']?.toString().trim();
+            final rank =
+                (rankValue == null || rankValue.isEmpty) ? 'Inicial' : rankValue;
+  
+            final completed =
+                (data['completed_jobs_count'] as num?)?.toInt() ?? 0;
+            final target = (data['target_jobs_count'] as num?)?.toInt();
+            final validTarget = target != null && target > 0 ? target : null;
+  
+            final progress = validTarget == null
+                ? null
+                : (completed / validTarget).clamp(0.0, 1.0).toDouble();
+  
+            final remaining = validTarget == null
+                ? null
+                : (validTarget - completed).clamp(0, validTarget);
+  
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+              children: [
+                _buildHero(
+                  rank: rank,
+                  completed: completed,
+                  target: validTarget,
+                  progress: progress,
                 ),
-              ),
-              const SizedBox(height: 24),
-              FixisSurface(
-                shadows: const [],
-                color: AppTheme.blueSoft,
-                border: Border.all(
-                  color: AppTheme.primaryBlue.withValues(alpha: 0.14),
-                ),
-                child: const Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 18),
+                Row(
                   children: [
-                    Icon(
-                      Icons.info_outline_rounded,
-                      color: AppTheme.primaryBlue,
-                    ),
-                    SizedBox(width: 12),
                     Expanded(
-                      child: Text(
-                        'FIXIS no mostrará rangos, insignias o beneficios ficticios. Tu nivel siempre se construye con información real de tus servicios.',
-                        style: TextStyle(
-                          color: AppTheme.slate700,
-                          height: 1.45,
-                        ),
+                      child: _MetricCard(
+                        label: 'Confirmados',
+                        value: '$completed',
+                        icon: Icons.task_alt_rounded,
+                        color: AppTheme.success,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _MetricCard(
+                        label: validTarget == null
+                            ? 'Meta'
+                            : 'Para meta',
+                        value: validTarget == null
+                            ? '—'
+                            : '${remaining ?? 0}',
+                        icon: Icons.flag_rounded,
+                        color: AppTheme.primaryBlue,
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          );
-        },
+                const SizedBox(height: 24),
+                const FixisSectionHeader(
+                  title: 'Cómo crece tu nivel',
+                  subtitle: 'Solo usamos datos confirmados del sistema',
+                ),
+                const SizedBox(height: 10),
+                FixisSurface(
+                  shadows: const [],
+                  border: Border.all(color: AppTheme.slate200),
+                  child: const Column(
+                    children: [
+                      _ProgressRule(
+                        icon: Icons.check_circle_rounded,
+                        color: AppTheme.success,
+                        title: 'Servicios aprobados',
+                        text:
+                            'Tu progreso aumenta cuando el cliente confirma el servicio.',
+                      ),
+                      SizedBox(height: 18),
+                      _ProgressRule(
+                        icon: Icons.shield_rounded,
+                        color: AppTheme.primaryBlue,
+                        title: 'Progreso respaldado',
+                        text:
+                            'Los rangos mostrados provienen de expert_gamification.',
+                      ),
+                      SizedBox(height: 18),
+                      _ProgressRule(
+                        icon: Icons.emoji_events_rounded,
+                        color: AppTheme.warning,
+                        title: 'Beneficios futuros',
+                        text:
+                            'Las insignias y beneficios aparecerán cuando existan reglas reales definidas.',
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                FixisSurface(
+                  shadows: const [],
+                  color: AppTheme.blueSoft,
+                  border: Border.all(
+                    color: AppTheme.primaryBlue.withValues(alpha: 0.14),
+                  ),
+                  child: const Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.info_outline_rounded,
+                        color: AppTheme.primaryBlue,
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'FIXIS no mostrará rangos, insignias o beneficios ficticios. Tu nivel siempre se construye con información real de tus servicios.',
+                          style: TextStyle(
+                            color: AppTheme.slate700,
+                            height: 1.45,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

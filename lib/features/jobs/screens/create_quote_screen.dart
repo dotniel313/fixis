@@ -173,6 +173,8 @@ class _CreateQuoteScreenState extends ConsumerState<CreateQuoteScreen> {
         foregroundColor: AppTheme.darkSlate,
       ),
       body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(

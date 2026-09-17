@@ -123,144 +123,148 @@ class _CustomerJobDetailScreenState extends ConsumerState<CustomerJobDetailScree
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: _refresh,
-        child: StreamBuilder<Map<String, dynamic>>(
-          stream: repo.watchJob(widget.jobId),
-          builder: (context, jobSnapshot) {
-            if (jobSnapshot.connectionState == ConnectionState.waiting) {
-              return ListView(children: const [SizedBox(height: 240), Center(child: CircularProgressIndicator())]);
-            }
-            if (jobSnapshot.hasError || jobSnapshot.data == null || jobSnapshot.data!.isEmpty) {
-              return ListView(children: const [SizedBox(height: 160), Center(child: Text('No pudimos cargar el servicio.'))]);
-            }
-
-            final job = jobSnapshot.data!;
-            final status = job['status']?.toString() ?? 'pending';
-
-            return ListView(
-              padding: const EdgeInsets.all(20),
-              children: [
-                Text(job['title']?.toString() ?? 'Servicio', style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 8),
-                Text(job['category']?.toString() ?? '', style: const TextStyle(color: AppTheme.primaryOrange, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 20),
-                _card('Estado', _statusLabel(status), Icons.timeline),
-                const SizedBox(height: 12),
-                _card('Dirección', job['address']?.toString() ?? '-', Icons.location_on_outlined),
-                if ((job['address_reference']?.toString() ?? '').isNotEmpty) ...[
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: RefreshIndicator(
+          onRefresh: _refresh,
+          child: StreamBuilder<Map<String, dynamic>>(
+            stream: repo.watchJob(widget.jobId),
+            builder: (context, jobSnapshot) {
+              if (jobSnapshot.connectionState == ConnectionState.waiting) {
+                return ListView(children: const [SizedBox(height: 240), Center(child: CircularProgressIndicator())]);
+              }
+              if (jobSnapshot.hasError || jobSnapshot.data == null || jobSnapshot.data!.isEmpty) {
+                return ListView(children: const [SizedBox(height: 160), Center(child: Text('No pudimos cargar el servicio.'))]);
+              }
+  
+              final job = jobSnapshot.data!;
+              final status = job['status']?.toString() ?? 'pending';
+  
+              return ListView(
+                padding: const EdgeInsets.all(20),
+                children: [
+                  Text(job['title']?.toString() ?? 'Servicio', style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 8),
+                  Text(job['category']?.toString() ?? '', style: const TextStyle(color: AppTheme.primaryOrange, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 20),
+                  _card('Estado', _statusLabel(status), Icons.timeline),
                   const SizedBox(height: 12),
-                  _card('Referencia', job['address_reference'].toString(), Icons.signpost_outlined),
+                  _card('Dirección', job['address']?.toString() ?? '-', Icons.location_on_outlined),
+                  if ((job['address_reference']?.toString() ?? '').isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    _card('Referencia', job['address_reference'].toString(), Icons.signpost_outlined),
+                  ],
+                  if ((job['requested_visit_at']?.toString() ?? '').isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    _card('Preferencia de visita', _formatVisitDate(job['requested_visit_at']), Icons.event_outlined),
+                  ],
+                  if ((job['description']?.toString() ?? '').isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    _card('Descripción', job['description'].toString(), Icons.description_outlined),
+                  ],
+                  const SizedBox(height: 24),
+                  if (status == 'quote_submitted') ...[
+                    const Text('Cotizaciones', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 12),
+                    FutureBuilder<List<Map<String, dynamic>>>(
+                      future: repo.getQuotesForJob(widget.jobId),
+                      builder: (context, quotesSnapshot) {
+                        if (quotesSnapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final quotes = quotesSnapshot.data ?? const [];
+                        if (quotes.isEmpty) return const Text('Todavía no hay cotizaciones visibles.');
+                        return Column(
+                          children: quotes.map((q) => _quoteCard(q)).toList(),
+                        );
+                      },
+                    ),
+                  ],
+                  if (status == 'authorized')
+                    _actionInfo('Cotización aprobada', 'El FIXI preparará su trayecto hacia tu ubicación.', Icons.check_circle, Colors.green),
+                  if (status == 'en_route') ...[
+                    _actionInfo('Tu FIXI está en camino', 'Su ubicación se está actualizando en tiempo real.', Icons.navigation_rounded, AppTheme.primaryBlue),
+                    const SizedBox(height: 12),
+                    _liveMapCard(repo, job),
+                  ],
+                  if (status == 'arrived') ...[
+                    _actionInfo('Tu FIXI llegó', 'El profesional registró su llegada al lugar del servicio.', Icons.location_on_rounded, Colors.green),
+                    const SizedBox(height: 12),
+                    _liveMapCard(repo, job, arrived: true),
+                  ],
+                  if (status == 'quote_revision_pending') ...[
+                    _actionInfo(
+                      'Cambio de alcance solicitado',
+                      'El FIXI encontró condiciones distintas en el lugar. Revisa la propuesta antes de que empiece el trabajo.',
+                      Icons.price_change_rounded,
+                      Colors.orange,
+                    ),
+                    const SizedBox(height: 16),
+                    FutureBuilder<List<Map<String, dynamic>>>(
+                      future: repo.getQuotesForJob(widget.jobId),
+                      builder: (context, quotesSnapshot) {
+                        if (quotesSnapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final quotes = quotesSnapshot.data ?? const [];
+                        return _revisionDecisionCard(job, quotes);
+                      },
+                    ),
+                  ],
+                  if (status == 'in_progress')
+                    _actionInfo('Servicio en curso', 'El FIXI está realizando el trabajo.', Icons.handyman, AppTheme.primaryBlue),
+                  if (status == 'work_completed') ...[
+                    _actionInfo(
+                      'Trabajo finalizado por el FIXI',
+                      'Revisa el servicio. Si estás conforme, continúa al pago.',
+                      Icons.task_alt,
+                      Colors.orange,
+                    ),
+                    const SizedBox(height: 16),
+                    FutureBuilder<Map<String, dynamic>?>(
+                      future: repo.getPaymentForJob(widget.jobId),
+                      builder: (context, paymentSnapshot) {
+                        final payment = paymentSnapshot.data;
+                        final paymentStatus =
+                            payment?['status']?.toString();
+  
+                        final label = switch (paymentStatus) {
+                          'pending_verification' =>
+                            'Pago en verificación',
+                          'voucher_uploaded' =>
+                            'Pago en verificación',
+                          'rejected' =>
+                            'Revisar pago rechazado',
+                          'paid' =>
+                            'Pago confirmado',
+                          _ =>
+                            'Aprobar y pagar',
+                        };
+  
+                        final icon = paymentStatus == 'paid'
+                            ? Icons.verified_rounded
+                            : Icons.payments_outlined;
+  
+                        return SizedBox(
+                          width: double.infinity,
+                          child: FilledButton.icon(
+                            onPressed: _loadingAction
+                                ? null
+                                : _openPayment,
+                            icon: Icon(icon),
+                            label: Text(label),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                  if (status == 'customer_approved')
+                    _actionInfo('Servicio confirmado', 'FIXIS confirmó el pago y el servicio quedó cerrado financieramente.', Icons.verified, Colors.green),
                 ],
-                if ((job['requested_visit_at']?.toString() ?? '').isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  _card('Preferencia de visita', _formatVisitDate(job['requested_visit_at']), Icons.event_outlined),
-                ],
-                if ((job['description']?.toString() ?? '').isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  _card('Descripción', job['description'].toString(), Icons.description_outlined),
-                ],
-                const SizedBox(height: 24),
-                if (status == 'quote_submitted') ...[
-                  const Text('Cotizaciones', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-                  const SizedBox(height: 12),
-                  FutureBuilder<List<Map<String, dynamic>>>(
-                    future: repo.getQuotesForJob(widget.jobId),
-                    builder: (context, quotesSnapshot) {
-                      if (quotesSnapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      final quotes = quotesSnapshot.data ?? const [];
-                      if (quotes.isEmpty) return const Text('Todavía no hay cotizaciones visibles.');
-                      return Column(
-                        children: quotes.map((q) => _quoteCard(q)).toList(),
-                      );
-                    },
-                  ),
-                ],
-                if (status == 'authorized')
-                  _actionInfo('Cotización aprobada', 'El FIXI preparará su trayecto hacia tu ubicación.', Icons.check_circle, Colors.green),
-                if (status == 'en_route') ...[
-                  _actionInfo('Tu FIXI está en camino', 'Su ubicación se está actualizando en tiempo real.', Icons.navigation_rounded, AppTheme.primaryBlue),
-                  const SizedBox(height: 12),
-                  _liveMapCard(repo, job),
-                ],
-                if (status == 'arrived') ...[
-                  _actionInfo('Tu FIXI llegó', 'El profesional registró su llegada al lugar del servicio.', Icons.location_on_rounded, Colors.green),
-                  const SizedBox(height: 12),
-                  _liveMapCard(repo, job, arrived: true),
-                ],
-                if (status == 'quote_revision_pending') ...[
-                  _actionInfo(
-                    'Cambio de alcance solicitado',
-                    'El FIXI encontró condiciones distintas en el lugar. Revisa la propuesta antes de que empiece el trabajo.',
-                    Icons.price_change_rounded,
-                    Colors.orange,
-                  ),
-                  const SizedBox(height: 16),
-                  FutureBuilder<List<Map<String, dynamic>>>(
-                    future: repo.getQuotesForJob(widget.jobId),
-                    builder: (context, quotesSnapshot) {
-                      if (quotesSnapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      final quotes = quotesSnapshot.data ?? const [];
-                      return _revisionDecisionCard(job, quotes);
-                    },
-                  ),
-                ],
-                if (status == 'in_progress')
-                  _actionInfo('Servicio en curso', 'El FIXI está realizando el trabajo.', Icons.handyman, AppTheme.primaryBlue),
-                if (status == 'work_completed') ...[
-                  _actionInfo(
-                    'Trabajo finalizado por el FIXI',
-                    'Revisa el servicio. Si estás conforme, continúa al pago.',
-                    Icons.task_alt,
-                    Colors.orange,
-                  ),
-                  const SizedBox(height: 16),
-                  FutureBuilder<Map<String, dynamic>?>(
-                    future: repo.getPaymentForJob(widget.jobId),
-                    builder: (context, paymentSnapshot) {
-                      final payment = paymentSnapshot.data;
-                      final paymentStatus =
-                          payment?['status']?.toString();
-
-                      final label = switch (paymentStatus) {
-                        'pending_verification' =>
-                          'Pago en verificación',
-                        'voucher_uploaded' =>
-                          'Pago en verificación',
-                        'rejected' =>
-                          'Revisar pago rechazado',
-                        'paid' =>
-                          'Pago confirmado',
-                        _ =>
-                          'Aprobar y pagar',
-                      };
-
-                      final icon = paymentStatus == 'paid'
-                          ? Icons.verified_rounded
-                          : Icons.payments_outlined;
-
-                      return SizedBox(
-                        width: double.infinity,
-                        child: FilledButton.icon(
-                          onPressed: _loadingAction
-                              ? null
-                              : _openPayment,
-                          icon: Icon(icon),
-                          label: Text(label),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-                if (status == 'customer_approved')
-                  _actionInfo('Servicio confirmado', 'FIXIS confirmó el pago y el servicio quedó cerrado financieramente.', Icons.verified, Colors.green),
-              ],
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );

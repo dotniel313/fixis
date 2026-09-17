@@ -736,25 +736,29 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
         foregroundColor: AppTheme.darkSlate,
         elevation: 1,
       ),
-      body: RefreshIndicator(
-        onRefresh: _refreshData,
-        child: ListView(
-          padding: const EdgeInsets.all(24),
-          children: [
-            _buildJobHeader(),
-            const SizedBox(height: 20),
-            _buildStatusCard(),
-            const SizedBox(height: 20),
-            if (_status == 'accepted') _buildAcceptedActions(),
-            if (_status == 'quote_submitted') _buildQuoteSubmittedActions(),
-            if (_status == 'authorized') _buildAuthorizedPlaceholder(),
-            if (_status == 'en_route') _buildEnRouteState(),
-            if (_status == 'arrived') _buildArrivedState(),
-            if (_status == 'quote_revision_pending') _buildRevisionPendingState(),
-            if (_status == 'in_progress') _buildEvidenceFlow(),
-            if (_status == 'customer_approved') _buildCustomerApprovedState(),
-            if (_status == 'completed') _buildCompletedState(),
-          ],
+      body: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: RefreshIndicator(
+          onRefresh: _refreshData,
+          child: ListView(
+            padding: const EdgeInsets.all(24),
+            children: [
+              _buildJobHeader(),
+              const SizedBox(height: 20),
+              _buildStatusCard(),
+              const SizedBox(height: 20),
+              if (_status == 'accepted') _buildAcceptedActions(),
+              if (_status == 'quote_submitted') _buildQuoteSubmittedActions(),
+              if (_status == 'authorized') _buildAuthorizedPlaceholder(),
+              if (_status == 'en_route') _buildEnRouteState(),
+              if (_status == 'arrived') _buildArrivedState(),
+              if (_status == 'quote_revision_pending') _buildRevisionPendingState(),
+              if (_status == 'in_progress') _buildEvidenceFlow(),
+              if (_status == 'customer_approved') _buildCustomerApprovedState(),
+              if (_status == 'completed') _buildCompletedState(),
+            ],
+          ),
         ),
       ),
     );
