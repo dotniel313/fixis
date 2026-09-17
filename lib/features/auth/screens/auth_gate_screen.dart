@@ -60,7 +60,7 @@ class _AccessLoadingScreen extends StatelessWidget {
       backgroundColor: AppTheme.primaryOrange,
       body: SafeArea(
         top: false,
-        minimum: const EdgeInsets.only(bottom: 12),
+        minimum: EdgeInsets.only(bottom: 12),
         child: Center(
           child: CircularProgressIndicator(color: Colors.white),
         ),

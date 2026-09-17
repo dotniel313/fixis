@@ -164,10 +164,10 @@ class _CustomerPaymentScreenState
     if (_loading) {
       return Scaffold(
         appBar: AppBar(title: const Text('Aprobar y pagar')),
-        body: SafeArea(
+        body: const SafeArea(
           top: false,
-          minimum: const EdgeInsets.only(bottom: 12),
-          child: const Center(child: CircularProgressIndicator()),
+          minimum: EdgeInsets.only(bottom: 12),
+          child: Center(child: CircularProgressIndicator()),
         ),
       );
     }
