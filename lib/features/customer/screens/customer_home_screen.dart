@@ -22,20 +22,23 @@ class CustomerHomeScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppTheme.primaryOrange,
-        foregroundColor: Colors.white,
-        elevation: 4,
-        onPressed: () async {
-          final created = await Navigator.of(context).push<bool>(
-            MaterialPageRoute(builder: (_) => const CreateJobScreen()),
-          );
-          if (created == true) ref.invalidate(myCustomerJobsProvider);
-        },
-        icon: const Icon(Icons.add_rounded),
-        label: const Text(
-          'Solicitar servicio',
-          style: TextStyle(fontWeight: FontWeight.w900),
+      floatingActionButton: SafeArea(
+        minimum: const EdgeInsets.only(bottom: 12),
+        child: FloatingActionButton.extended(
+          backgroundColor: AppTheme.primaryOrange,
+          foregroundColor: Colors.white,
+          elevation: 4,
+          onPressed: () async {
+            final created = await Navigator.of(context).push<bool>(
+              MaterialPageRoute(builder: (_) => const CreateJobScreen()),
+            );
+            if (created == true) ref.invalidate(myCustomerJobsProvider);
+          },
+          icon: const Icon(Icons.add_rounded),
+          label: const Text(
+            'Solicitar servicio',
+            style: TextStyle(fontWeight: FontWeight.w900),
+          ),
         ),
       ),
       body: RefreshIndicator(
