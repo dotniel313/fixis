@@ -312,6 +312,17 @@ class JobsRepository {
   }
 
 
+  Stream<Map<String, dynamic>> watchJob(String jobId) {
+    return _supabase
+        .from('jobs')
+        .stream(primaryKey: ['id'])
+        .eq('id', jobId)
+        .map((rows) {
+          if (rows.isEmpty) return <String, dynamic>{};
+          return Map<String, dynamic>.from(rows.first);
+        });
+  }
+
   Future<Map<String, dynamic>?> getJobById(String jobId) async {
     try {
       final response = await _supabase

@@ -1,6 +1,6 @@
 # FIXIS — QA Matrix
 
-Ultima actualizacion: 2026-09-16
+Ultima actualizacion: 2026-09-17
 
 ## Estados
 
@@ -23,7 +23,9 @@ Ultima actualizacion: 2026-09-16
 | Supabase Transactional Reset | PASS | docs/QA_TRANSACTIONAL_RESET_v1.10.8.7.md |
 | Backup Transactional | PASS | fixis_backup_reset_20260916 |
 | Clean Database Baseline | PASS | jobs, quotes, snapshots, ledger, payments, commissions, settlements y settlement_items = 0 |
-| Revised Quote Flow | PENDING | Ejecutar E2E sobre base limpia |
+| Revised Quote Flow | PENDING | E2E llego hasta aceptacion de revision; continuar tras hotfix |
+| Quote Revision Realtime | PENDING | Migracion 031 y suscripcion Flutter preparadas; falta aplicar y validar |
+| Revision Notification FIXI | PENDING | Evento persistente e in-app preparado; falta QA fisico |
 | Finance Regression | PENDING | quote -> snapshot -> payment -> ledger -> settlement |
 | Security Regression | PENDING | Validar RLS y RPC despues del E2E |
 

@@ -33,6 +33,7 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
   bool _isLoadingQuote = true;
   bool _isStartingJob = false;
   bool _isRouteActionLoading = false;
+  StreamSubscription<Map<String, dynamic>>? _jobSubscription;
   StreamSubscription<Position>? _liveLocationSubscription;
   DateTime? _lastLiveSyncAt;
   Position? _lastLivePosition;
@@ -48,6 +49,7 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
   void initState() {
     super.initState();
     _job = Map<String, dynamic>.from(widget.job);
+    _subscribeToJobUpdates();
     _refreshData().then((_) {
       if (mounted && _status == 'en_route') {
         _startLiveTracking();
@@ -57,11 +59,66 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
 
   @override
   void dispose() {
+    _jobSubscription?.cancel();
     _liveLocationSubscription?.cancel();
     super.dispose();
   }
 
   String get _status => _job['status']?.toString() ?? 'pending';
+
+  void _subscribeToJobUpdates() {
+    final jobId = _job['id']?.toString();
+    if (jobId == null || jobId.isEmpty) return;
+
+    _jobSubscription = ref
+        .read(jobsRepositoryProvider)
+        .watchJob(jobId)
+        .listen(
+      (freshJob) async {
+        if (!mounted || freshJob.isEmpty) return;
+
+        final previousStatus = _status;
+        final previousAcceptedQuoteId =
+            _job['accepted_quote_id']?.toString();
+        final nextStatus = freshJob['status']?.toString() ?? 'pending';
+        final nextAcceptedQuoteId =
+            freshJob['accepted_quote_id']?.toString();
+
+        final revisionResolved =
+            previousStatus == 'quote_revision_pending' &&
+            nextStatus == 'arrived';
+        final revisionAccepted =
+            revisionResolved &&
+            previousAcceptedQuoteId != nextAcceptedQuoteId;
+
+        setState(() => _job = freshJob);
+
+        if (previousStatus != nextStatus ||
+            previousAcceptedQuoteId != nextAcceptedQuoteId) {
+          await _refreshData();
+        }
+
+        if (!mounted || !revisionResolved) return;
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(
+                revisionAccepted
+                    ? 'El cliente aceptó el nuevo alcance. Ya puedes iniciar el trabajo.'
+                    : 'El cliente rechazó el nuevo alcance. Se mantiene la cotización anterior.',
+              ),
+              backgroundColor:
+                  revisionAccepted ? Colors.green : Colors.orange,
+            ),
+          );
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        debugPrint('[JOB_REALTIME] subscription error: $error');
+      },
+    );
+  }
 
   Future<void> _refreshData() async {
     final jobId = _job['id']?.toString();
