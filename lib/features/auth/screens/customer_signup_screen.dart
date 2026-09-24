@@ -71,6 +71,24 @@ class _CustomerSignupScreenState extends ConsumerState<CustomerSignupScreen> {
     try {
       final repo = ref.read(authRepositoryProvider);
       await repo.verifyOtp(repo.normalizeEmail(_email.text), _code.text.trim());
+      final profile = await repo.getAccessProfile(forceRefresh: true);
+      if (profile?['role'] != 'customer') {
+        // The email may already belong to an admin or professional. Only
+        // disclose that after the user has proved access to the mailbox.
+        await repo.signOut();
+        if (!mounted) return;
+        setState(() {
+          _sent = false;
+          _code.clear();
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Este correo ya pertenece a otra cuenta. Inicia sesión desde la pantalla anterior.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
       repo.clearAccessCache();
       ref.invalidate(appAccessProvider);
       if (!mounted) return;
