@@ -30,6 +30,7 @@ class _AccessRestrictedScreenState
     setState(() => _isSigningOut = true);
     await ref.read(authRepositoryProvider).signOut();
     if (!mounted) return;
+    ref.invalidate(appAccessProvider);
     Navigator.of(context).pushNamedAndRemoveUntil('/', (_) => false);
   }
 
