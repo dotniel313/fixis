@@ -34,8 +34,13 @@ class ProfessionalAccessDecision {
 class AuthFlowException implements Exception {
   final String message;
   final String? code;
+  final bool deliveryUncertain;
 
-  const AuthFlowException(this.message, {this.code});
+  const AuthFlowException(
+    this.message, {
+    this.code,
+    this.deliveryUncertain = false,
+  });
 
   @override
   String toString() => message;
@@ -79,12 +84,17 @@ class AuthRepository {
     } on AuthException catch (e) {
       stopwatch.stop();
       _logAuthFailure('sendOtp', e, stopwatch.elapsedMilliseconds);
-      throw AuthFlowException(_friendlyAuthMessage(e), code: e.code);
+      throw AuthFlowException(
+        _friendlyAuthMessage(e),
+        code: e.code,
+        deliveryUncertain: _isDeliveryUncertain(e),
+      );
     } catch (e) {
       stopwatch.stop();
       debugPrint('[AUTH] sendOtp unexpected error after ${stopwatch.elapsedMilliseconds} ms: $e');
       throw const AuthFlowException(
-        'No fue posible enviar el código. Revisa tu conexión e inténtalo nuevamente.',
+        'No pudimos confirmar el envío. Si llega un código, introdúcelo; si no, solicita otro después de 60 segundos.',
+        deliveryUncertain: true,
       );
     }
   }
@@ -115,12 +125,17 @@ class AuthRepository {
     } on AuthException catch (e) {
       stopwatch.stop();
       _logAuthFailure('sendCustomerSignupOtp', e, stopwatch.elapsedMilliseconds);
-      throw AuthFlowException(_friendlyAuthMessage(e), code: e.code);
+      throw AuthFlowException(
+        _friendlyAuthMessage(e),
+        code: e.code,
+        deliveryUncertain: _isDeliveryUncertain(e),
+      );
     } catch (e) {
       stopwatch.stop();
       debugPrint('[AUTH] sendCustomerSignupOtp unexpected error after ${stopwatch.elapsedMilliseconds} ms: $e');
       throw const AuthFlowException(
-        'No fue posible enviar el código para crear la cuenta.',
+        'No pudimos confirmar el envío. Si llega un código, introdúcelo; si no, solicita otro después de 60 segundos.',
+        deliveryUncertain: true,
       );
     }
   }
@@ -164,6 +179,14 @@ class AuthRepository {
     );
   }
 
+  bool _isDeliveryUncertain(AuthException error) {
+    final message = error.message.toLowerCase();
+    return error.statusCode?.toString() == '504' ||
+        error.code == 'request_timeout' ||
+        message.contains('upstream request timeout') ||
+        message.contains('gateway timeout');
+  }
+
   String _friendlyAuthMessage(AuthException error) {
     final code = (error.code ?? '').toLowerCase();
     final message = error.message.toLowerCase();
@@ -172,11 +195,9 @@ class AuthRepository {
       return 'Este código expiró. Solicita uno nuevo y usa únicamente el correo más reciente.';
     }
     if (code == 'otp_disabled') {
-      return 'El acceso mediante código está temporalmente deshabilitado.';
+      return 'No se pudo solicitar el código. El servicio de acceso por correo no está disponible en este momento.';
     }
-    if (error.statusCode?.toString() == '504' ||
-        message.contains('upstream request timeout') ||
-        message.contains('gateway timeout')) {
+    if (_isDeliveryUncertain(error)) {
       return 'El servicio de correo está tardando más de lo esperado. '
           'El código todavía puede llegar. Espera al menos 60 segundos '
           'y usa únicamente el correo más reciente antes de solicitar otro.';
