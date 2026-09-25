@@ -32,7 +32,7 @@ Ultima actualizacion: 2026-09-25
 | Quote Revision Realtime | PENDING | Migracion 031 y suscripcion Flutter preparadas; verificar aplicacion real y latencia en dispositivos |
 | Revision Notification FIXI | PENDING | Evento persistente e in-app preparado; falta QA fisico |
 | Cross-device Safe Areas | PENDING | 23 pantallas auditadas; validar Redmi Note 12, iPhone 15 y iPhone 15 Pro |
-| Finance Regression | PENDING | Dos pagos con earnings y comisiones conciliados; corte semanal generó una liquidacion solicitada con saldo asignado segun captura de QA; falta verificar settlement_items y ciclo de procesamiento/pago |
+| Finance Regression | PENDING | Dos pagos con earnings y comisiones conciliados; corte semanal con una liquidacion requested y dos settlement_items de dos trabajos, suma asignada igual a importe solicitado; falta probar procesamiento y pago real |
 | Security Regression | PENDING | Validar RLS y RPC despues del E2E |
 | Login / Signup Android actualizado | PENDING | Funcionamiento general reportado el 2026-09-25; falta registrar resultados separados: OTP cliente/FIXI/admin, correo existente de otro rol y reenvio |
 
