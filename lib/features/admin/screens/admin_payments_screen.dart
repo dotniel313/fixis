@@ -908,54 +908,59 @@ class _AdminPaymentsScreenState extends ConsumerState<AdminPaymentsScreen> {
       builder: (dialogContext) {
         var reference = '';
         var notes = '';
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-          ),
-          title: const Text(
-            'Confirmar pago al profesional',
-            style: TextStyle(fontWeight: FontWeight.w900),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Confirma el desembolso de '
-                  '${_money(settlement['requested_amount'])}.',
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  onChanged: (v) => reference = v.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'Referencia bancaria',
-                    border: OutlineInputBorder(),
+        return StatefulBuilder(
+          builder: (dialogContext, setDialogState) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+            ),
+            title: const Text(
+              'Confirmar pago al profesional',
+              style: TextStyle(fontWeight: FontWeight.w900),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Confirma el desembolso de '
+                    '${_money(settlement['requested_amount'])}.',
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  onChanged: (v) => notes = v.trim(),
-                  decoration: const InputDecoration(
-                    labelText: 'Notas (opcional)',
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: 16),
+                  TextField(
+                    onChanged: (v) => setDialogState(() => reference = v.trim()),
+                    decoration: const InputDecoration(
+                      labelText: 'Referencia bancaria',
+                      helperText: 'Ingresa la referencia de la transferencia realizada.',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  TextField(
+                    onChanged: (v) => notes = v.trim(),
+                    decoration: const InputDecoration(
+                      labelText: 'Notas (opcional)',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ),
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: reference.isEmpty
+                    ? null
+                    : () => Navigator.of(dialogContext).pop({
+                          'reference': reference,
+                          'notes': notes,
+                        }),
+                child: const Text('Marcar pagada'),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancelar'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(dialogContext).pop({
-                'reference': reference,
-                'notes': notes,
-              }),
-              child: const Text('Marcar pagada'),
-            ),
-          ],
         );
       },
     );
