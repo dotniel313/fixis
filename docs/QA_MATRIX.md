@@ -33,7 +33,7 @@ Ultima actualizacion: 2026-09-25
 | Revision Notification FIXI | PENDING | Evento persistente e in-app preparado; falta QA fisico |
 | Cross-device Safe Areas | PENDING | 23 pantallas auditadas; validar Redmi Note 12, iPhone 15 y iPhone 15 Pro |
 | Finance Regression | PENDING | Dos pagos conciliados; corte semanal en processing sin debito; migracion 032 y build iOS release verificados por usuario: referencia requerida, notas opcionales; falta transferencia real y cierre paid |
-| Security Regression | PENDING | RLS activo en ocho tablas; permisos RPC correctos; simulacion SQL de customer autentificado: ve su pago, no ve pagos ajenos ni liquidaciones; faltan roles profesional y admin con sesiones reales |
+| Security Regression | PENDING | RLS activo en ocho tablas y permisos RPC correctos; simulaciones SQL de customer y professional pasan: aislamiento de pagos, liquidaciones y comision FIXIS; faltan admin y pruebas con sesiones reales |
 | Login / Signup Android actualizado | PENDING | Funcionamiento general reportado el 2026-09-25; falta registrar resultados separados: OTP cliente/FIXI/admin, correo existente de otro rol y reenvio |
 
 ## Criterios v1.10.8.6
