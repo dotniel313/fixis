@@ -21,7 +21,7 @@ Ultima actualizacion: 2026-09-25
 | iOS Build | PASS | Compilacion e instalacion mediante flutter run en iPhone 15 |
 | iOS Install/Launch Smoke | PASS | 2026-09-25: usuario confirma que build release abre con normalidad desde icono en iPhone 15 Pro sin depurador; informe del fallo al reabrir muestra build debug |
 | iOS Physical QA | PENDING | Flujo de pago en tres telefonos y arranque release sin depurador validados; faltan otras rutas por rol y sesion/reingreso |
-| iOS Login OTP | PENDING | 2026-09-25: otp_disabled al usar un correo que parece tener error de escritura; verificar correo registrado y repetir; build 10805 aclara el mensaje |
+| iOS Login OTP | PENDING | 2026-09-25: acceso del administrador funciona en iPhone 15 Pro release; faltan comprobar por separado envio/codigo OTP y retencion de sesion en todos los roles |
 | iOS Admin despues de autorizacion de pago | PASS | 2026-09-25: usuario confirma que el administrador registro la transferencia tras completar el flujo en los tres telefonos de prueba |
 | Supabase Transactional Reset | PASS | docs/QA_TRANSACTIONAL_RESET_v1.10.8.7.md |
 | Backup Transactional | PASS | fixis_backup_reset_20260916 |
