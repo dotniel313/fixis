@@ -85,7 +85,9 @@ class AuthRepository {
       stopwatch.stop();
       _logAuthFailure('sendOtp', e, stopwatch.elapsedMilliseconds);
       throw AuthFlowException(
-        _friendlyAuthMessage(e),
+        e.code == 'otp_disabled'
+            ? 'No pudimos enviar el código. Revisa que el correo sea el de tu cuenta; si aún no tienes una, usa Crear cuenta cliente.'
+            : _friendlyAuthMessage(e),
         code: e.code,
         deliveryUncertain: _isDeliveryUncertain(e),
       );
