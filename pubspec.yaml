@@ -2,7 +2,7 @@ name: fixis_pro
 description: "Aplicacion para profesionales de Fixis"
 publish_to: 'Geotactics S.A.'
 
-version: 1.10.8+10803
+version: 1.10.8+10804
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
