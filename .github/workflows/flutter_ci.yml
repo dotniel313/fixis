@@ -65,3 +65,6 @@ jobs:
       - name: Run automated tests
         if: steps.tests.outputs.exists == 'true'
         run: flutter test
+
+      - name: Verify Android debug build with CI placeholders
+        run: flutter build apk --debug
