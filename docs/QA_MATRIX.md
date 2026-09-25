@@ -27,7 +27,7 @@ Ultima actualizacion: 2026-09-25
 | Backup Transactional | PASS | fixis_backup_reset_20260916 |
 | Clean Database Baseline (2026-09-16) | PASS | Conteos en cero al terminar el reset; no describe el estado actual de la base |
 | Backend Revised Quote / Realtime preflight | PASS | 2026-09-25: siete indicadores true en bloque 1 de supabase/qa/FIXIS_PRODUCTION_READINESS_READONLY.sql, resultado proporcionado desde Supabase |
-| Backend integridad transaccional de lectura | PASS | 2026-09-25: cinco conteos de anomalías en cero en bloque 2; resultado proporcionado desde Supabase |
+| Backend integridad transaccional de lectura | PASS | 2026-09-25: los cinco conteos del bloque 2 siguieron en cero tras registrar la transferencia; resultado proporcionado desde Supabase |
 | Revised Quote Flow | PASS | 2026-09-25: usuario confirma recorrido completo hasta el pago y registro de transferencia por administrador en tres telefonos; otros casos de revision aun requieren prueba |
 | Quote Revision Realtime | PENDING | Migracion 031 y suscripcion Flutter preparadas; verificar aplicacion real y latencia en dispositivos |
 | Revision Notification FIXI | PENDING | Evento persistente e in-app preparado; falta QA fisico |
