@@ -246,12 +246,18 @@ class AdminPaymentsRepository {
     String? payoutReference,
     String? notes,
   }) async {
+    final reference = _nullIfBlank(payoutReference);
+    if (reference == null) {
+      throw const AdminPaymentException(
+        'Ingresa la referencia bancaria del pago realizado.',
+      );
+    }
     try {
       final response = await _supabase.rpc(
         'admin_mark_settlement_paid',
         params: {
           'p_settlement_id': settlementId,
-          'p_payout_reference': _nullIfBlank(payoutReference),
+          'p_payout_reference': reference,
           'p_notes': _nullIfBlank(notes),
         },
       );
@@ -323,6 +329,9 @@ class AdminPaymentsRepository {
     }
     if (message.contains('INVALID_SETTLEMENT_STATE')) {
       return 'La liquidación cambió de estado. Actualiza la pantalla.';
+    }
+    if (message.contains('PAYOUT_REFERENCE_REQUIRED')) {
+      return 'Ingresa la referencia bancaria del pago realizado.';
     }
     if (message.contains('REJECTION_REASON_REQUIRED')) {
       return 'Debes indicar un motivo para rechazar la liquidación.';
