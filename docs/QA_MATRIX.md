@@ -22,6 +22,7 @@ Ultima actualizacion: 2026-09-25
 | iOS Install/Launch Smoke | PASS | Runner inicio correctamente; pausa observada correspondia a breakpoint local de Xcode |
 | iOS Physical QA | PENDING | Falta ejecutar el flujo funcional end-to-end |
 | iOS Login OTP | PENDING | 2026-09-25: otp_disabled al usar un correo que parece tener error de escritura; verificar correo registrado y repetir; build 10805 aclara el mensaje |
+| iOS Admin despues de autorizacion de pago | FAIL | 2026-09-25: usuario reporta cierre completo de la app y que no puede continuar; pendiente informe de cierre de iOS y estado del ultimo pago; no repetir confirmacion hasta reconciliar |
 | Supabase Transactional Reset | PASS | docs/QA_TRANSACTIONAL_RESET_v1.10.8.7.md |
 | Backup Transactional | PASS | fixis_backup_reset_20260916 |
 | Clean Database Baseline (2026-09-16) | PASS | Conteos en cero al terminar el reset; no describe el estado actual de la base |
