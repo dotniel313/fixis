@@ -33,7 +33,7 @@ Ultima actualizacion: 2026-09-25
 | Revision Notification FIXI | PENDING | Evento persistente e in-app preparado; falta QA fisico |
 | Cross-device Safe Areas | PENDING | 23 pantallas auditadas; validar Redmi Note 12, iPhone 15 y iPhone 15 Pro |
 | Finance Regression | PENDING | Dos pagos conciliados; corte semanal asigno dos ganancias y paso de requested a processing; saldo asignado igual al solicitado, sin settlement_debit antes del pago; falta transferencia real y cierre paid |
-| Security Regression | PENDING | Validar RLS y RPC despues del E2E |
+| Security Regression | PENDING | 2026-09-25: RLS activo en las ocho tablas criticas del recorrido de pago y liquidacion; faltan permisos EXECUTE de RPC y pruebas de aislamiento por rol |
 | Login / Signup Android actualizado | PENDING | Funcionamiento general reportado el 2026-09-25; falta registrar resultados separados: OTP cliente/FIXI/admin, correo existente de otro rol y reenvio |
 
 ## Criterios v1.10.8.6
