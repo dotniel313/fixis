@@ -69,7 +69,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _isLoading = false);
+        final deliveryUncertain =
+            e is AuthFlowException && e.deliveryUncertain;
+        if (!deliveryUncertain) {
+          _resetResendCooldown();
+        }
+        setState(() {
+          _isLoading = false;
+          if (deliveryUncertain) {
+            _emailController.text = email;
+            _codeSent = true;
+          }
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString()),
@@ -138,6 +149,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
   }
 
+  void _resetResendCooldown() {
+    _resendTimer?.cancel();
+    setState(() => _resendSeconds = 0);
+  }
+
   Future<void> _resendCode() async {
     if (_resendSeconds > 0 || _isLoading || _otpRequestInFlight) return;
     final repo = ref.read(authRepositoryProvider);
@@ -161,6 +177,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
     } catch (e) {
       if (!mounted) return;
+      if (e is! AuthFlowException || !e.deliveryUncertain) {
+        _resetResendCooldown();
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
       );
