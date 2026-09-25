@@ -141,3 +141,50 @@ WHERE q.parent_quote_id IS NOT NULL
         AND n.idempotency_key = 'JOB:' || q.job_id::text ||
             ':QUOTE_REVISION:' || q.id::text || ':' || upper(q.status)
   );
+
+-- BLOQUE 4: conciliar importes de los pagos confirmados con su snapshot.
+-- Un pago paid debe tener una entrada por cada importe positivo (ninguna
+-- si el importe es cero). Mostrar los ultimos diez pagos confirmados.
+-- OK valida presencia, cardinalidad y montos; no acredita el retiro al FIXI.
+SELECT
+    p.id AS payment_id,
+    p.status AS payment_status,
+    s.professional_amount AS expected_earning,
+    l.earning_entries,
+    l.earning_amount,
+    s.commission_amount AS expected_commission,
+    l.commission_entries,
+    l.commission_amount,
+    CASE
+        WHEN l.earning_entries = CASE WHEN s.professional_amount > 0 THEN 1 ELSE 0 END
+         AND l.earning_amount = s.professional_amount
+         AND l.commission_entries = CASE WHEN s.commission_amount > 0 THEN 1 ELSE 0 END
+         AND l.commission_amount = s.commission_amount
+        THEN 'OK' ELSE 'REVISAR'
+    END AS reconciliation
+FROM public.payments AS p
+JOIN public.job_financial_snapshots AS s ON s.id = p.snapshot_id
+CROSS JOIN LATERAL (
+    SELECT
+        count(*) FILTER (
+            WHERE le.entry_type = 'professional_earning'
+              AND le.direction = 'credit' AND le.status <> 'reversed'
+        ) AS earning_entries,
+        coalesce(sum(le.amount) FILTER (
+            WHERE le.entry_type = 'professional_earning'
+              AND le.direction = 'credit' AND le.status <> 'reversed'
+        ), 0) AS earning_amount,
+        count(*) FILTER (
+            WHERE le.entry_type = 'platform_commission'
+              AND le.direction = 'credit' AND le.status <> 'reversed'
+        ) AS commission_entries,
+        coalesce(sum(le.amount) FILTER (
+            WHERE le.entry_type = 'platform_commission'
+              AND le.direction = 'credit' AND le.status <> 'reversed'
+        ), 0) AS commission_amount
+    FROM public.financial_ledger_entries AS le
+    WHERE le.job_id = p.job_id AND le.snapshot_id = p.snapshot_id
+) AS l
+WHERE p.status = 'paid'
+ORDER BY p.created_at DESC
+LIMIT 10;
