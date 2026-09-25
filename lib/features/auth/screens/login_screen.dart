@@ -247,6 +247,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  textCapitalization: TextCapitalization.none,
                   decoration: InputDecoration(
                     hintText: 'ejemplo@correo.com',
                     prefixIcon: const Icon(Icons.email_outlined, color: Colors.grey),
