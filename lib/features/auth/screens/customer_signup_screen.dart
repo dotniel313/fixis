@@ -201,7 +201,14 @@ class _CustomerSignupScreenState extends ConsumerState<CustomerSignupScreen> {
               const SizedBox(height: 14),
               TextField(controller: _phone, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Teléfono (opcional)')),
               const SizedBox(height: 14),
-              TextField(controller: _email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Correo electrónico')),
+              TextField(
+                controller: _email,
+                keyboardType: TextInputType.emailAddress,
+                autocorrect: false,
+                enableSuggestions: false,
+                textCapitalization: TextCapitalization.none,
+                decoration: const InputDecoration(labelText: 'Correo electrónico'),
+              ),
               const SizedBox(height: 24),
               FilledButton(onPressed: _loading ? null : _send, child: const Text('Enviar código')),
             ] else ...[
