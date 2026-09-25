@@ -13,11 +13,11 @@ Ultima actualizacion: 2026-09-25
 
 | Area | Estado | Evidencia |
 |---|---|---|
-| Flutter Analyze | PASS | CI del flujo Android/Auth en 1098631; nueva configuracion de firma pendiente de CI |
+| Flutter Analyze | PASS | CI en 37a8e50 con nueva configuracion de firma |
 | Flutter Test | BLOCKED | No existen tests automatizados suficientes |
-| Android Debug Build | PASS | CI en 1098631 con .env de prueba; APK con entorno real pendiente |
+| Android Debug Build | PASS | CI en 37a8e50 con .env de prueba; usuario reporta APK actualizado funcionando el 2026-09-25 |
 | Android Release Bundle | PENDING | Configuracion de firma preparada en ae7aef3; requiere clave privada, .env real y compilacion firmada |
-| Android Physical QA | PENDING | Requiere dispositivo |
+| Android Physical QA | PENDING | Usuario reporta que funciona el 2026-09-25; faltan evidencias por rol y recorrido funcional completo |
 | iOS Build | PASS | Compilacion e instalacion mediante flutter run en iPhone 15 |
 | iOS Install/Launch Smoke | PASS | Runner inicio correctamente; pausa observada correspondia a breakpoint local de Xcode |
 | iOS Physical QA | PENDING | Falta ejecutar el flujo funcional end-to-end |
@@ -30,7 +30,7 @@ Ultima actualizacion: 2026-09-25
 | Cross-device Safe Areas | PENDING | 23 pantallas auditadas; validar Redmi Note 12, iPhone 15 y iPhone 15 Pro |
 | Finance Regression | PENDING | quote -> snapshot -> payment -> ledger -> settlement |
 | Security Regression | PENDING | Validar RLS y RPC despues del E2E |
-| Login / Signup Android actualizado | PENDING | Probar OTP de cliente/FIXI/admin, cuenta nueva, correo existente de otro rol y reenvio en el APK con .env real |
+| Login / Signup Android actualizado | PENDING | Funcionamiento general reportado el 2026-09-25; falta registrar resultados separados: OTP cliente/FIXI/admin, correo existente de otro rol y reenvio |
 
 ## Criterios v1.10.8.6
 
