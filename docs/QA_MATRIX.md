@@ -19,8 +19,8 @@ Ultima actualizacion: 2026-09-25
 | Android Release Bundle | PENDING | Configuracion de firma preparada en ae7aef3; requiere clave privada, .env real y compilacion firmada |
 | Android Physical QA | PENDING | Usuario reporta que funciona el 2026-09-25; faltan evidencias por rol y recorrido funcional completo |
 | iOS Build | PASS | Compilacion e instalacion mediante flutter run en iPhone 15 |
-| iOS Install/Launch Smoke | PENDING | 2026-09-25: informe de un cierre al reabrir build debug en iPhone 15 Pro; falta validar arranque de build release sin depurador |
-| iOS Physical QA | PENDING | Flujo desde revision hasta transferencia registrado por administrador validado en tres telefonos; faltan otras rutas por rol y arranque release sin depurador |
+| iOS Install/Launch Smoke | PASS | 2026-09-25: usuario confirma que build release abre con normalidad desde icono en iPhone 15 Pro sin depurador; cierre previo correspondia a build debug |
+| iOS Physical QA | PENDING | Flujo de pago en tres telefonos y arranque release sin depurador validados; faltan otras rutas por rol y sesion/reingreso |
 | iOS Login OTP | PENDING | 2026-09-25: otp_disabled al usar un correo que parece tener error de escritura; verificar correo registrado y repetir; build 10805 aclara el mensaje |
 | iOS Admin despues de autorizacion de pago | PASS | 2026-09-25: usuario confirma que el administrador registro la transferencia tras completar el flujo en los tres telefonos de prueba |
 | Supabase Transactional Reset | PASS | docs/QA_TRANSACTIONAL_RESET_v1.10.8.7.md |
