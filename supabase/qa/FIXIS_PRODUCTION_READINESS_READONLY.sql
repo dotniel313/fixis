@@ -33,8 +33,56 @@ SELECT
           AND schemaname = 'public' AND tablename = 'notifications'
     ) AS notifications_realtime;
 
--- BLOQUE 2: ejecutar las SELECT siguientes tras confirmar bloque 1.
--- Cada una devuelve solamente casos que necesitan investigacion.
+-- BLOQUE 2: ejecutar esta SELECT de resumen tras confirmar bloque 1.
+-- Devuelve una sola fila; todos los conteos deben ser cero. Los eventos
+-- anteriores a la aplicacion de 031 pueden aparecer como notificaciones
+-- faltantes aunque el trigger funcione correctamente desde entonces.
+SELECT
+    (SELECT count(*) FROM public.jobs
+     WHERE (status = 'quote_revision_pending')
+           IS DISTINCT FROM (pending_quote_revision_id IS NOT NULL))
+        AS jobs_revision_inconsistent,
+    (SELECT count(*) FROM (
+        SELECT j.id
+        FROM public.jobs AS j
+        JOIN public.job_financial_snapshots AS s ON s.job_id = j.id
+        GROUP BY j.id, j.accepted_quote_id
+        HAVING count(s.id) FILTER (WHERE s.is_current) <> 1
+            OR count(s.id) FILTER (WHERE s.is_current AND
+               s.quote_id IS DISTINCT FROM j.accepted_quote_id) > 0
+     ) AS anomalies) AS snapshots_inconsistent,
+    (SELECT count(*)
+     FROM public.payments AS p
+     JOIN public.job_financial_snapshots AS s ON s.id = p.snapshot_id
+     WHERE p.job_id IS DISTINCT FROM s.job_id
+        OR p.service_amount IS DISTINCT FROM s.gross_amount)
+        AS payments_inconsistent,
+    (SELECT count(*) FROM (
+        SELECT le.job_id, le.snapshot_id
+        FROM public.financial_ledger_entries AS le
+        JOIN public.job_financial_snapshots AS s ON s.id = le.snapshot_id
+        WHERE le.entry_type = 'platform_commission'
+          AND le.direction = 'credit' AND le.status <> 'reversed'
+        GROUP BY le.job_id, le.snapshot_id
+        HAVING count(*) <> 1
+            OR sum(le.amount) IS DISTINCT FROM max(s.commission_amount)
+            OR le.job_id IS DISTINCT FROM max(s.job_id::text)::uuid
+     ) AS anomalies) AS commissions_inconsistent,
+    (SELECT count(*)
+     FROM public.quotes AS q
+     WHERE q.parent_quote_id IS NOT NULL
+       AND q.status IN ('accepted', 'rejected')
+       AND NOT EXISTS (
+           SELECT 1 FROM public.notifications AS n
+           WHERE n.job_id = q.job_id
+             AND n.user_id = q.professional_id
+             AND n.type = 'quote_revision_' || q.status
+             AND n.idempotency_key = 'JOB:' || q.job_id::text ||
+                 ':QUOTE_REVISION:' || q.id::text || ':' || upper(q.status)
+       )) AS revision_notifications_missing;
+
+-- BLOQUE 3: consultas de detalle. Ejecutar solo la correspondiente al
+-- contador positivo de bloque 2; cada SELECT devuelve los casos a revisar.
 
 -- Revision pendiente y estado del trabajo deben coincidir.
 SELECT id AS job_id, status, pending_quote_revision_id
