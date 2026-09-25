@@ -21,6 +21,7 @@ Ultima actualizacion: 2026-09-25
 | iOS Build | PASS | Compilacion e instalacion mediante flutter run en iPhone 15 |
 | iOS Install/Launch Smoke | PASS | Runner inicio correctamente; pausa observada correspondia a breakpoint local de Xcode |
 | iOS Physical QA | PENDING | Falta ejecutar el flujo funcional end-to-end |
+| iOS Login OTP | PENDING | 2026-09-25: otp_disabled al usar un correo que parece tener error de escritura; verificar correo registrado y repetir; build 10805 aclara el mensaje |
 | Supabase Transactional Reset | PASS | docs/QA_TRANSACTIONAL_RESET_v1.10.8.7.md |
 | Backup Transactional | PASS | fixis_backup_reset_20260916 |
 | Clean Database Baseline (2026-09-16) | PASS | Conteos en cero al terminar el reset; no describe el estado actual de la base |
