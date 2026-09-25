@@ -263,9 +263,9 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
     Color color;
 
     if (activeStatus == 'processing') {
-      title = 'Pago en procesamiento';
+      title = 'Liquidación en procesamiento';
       subtitle =
-          '${_money(activeAmount)} está siendo transferido por FIXIS.'
+          '${_money(activeAmount)} sigue reservado hasta confirmar el pago.'
           '${scheduledFor != null ? ' Programado: $scheduledFor.' : ''}';
       icon = Icons.sync_rounded;
       color = AppTheme.primaryBlue;
@@ -710,7 +710,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                 ),
                 const SizedBox(height: 3),
                 const Text(
-                  'Disponible',
+                  'Ganancia registrada',
                   style: TextStyle(
                     color: Colors.green,
                     fontSize: 12,
