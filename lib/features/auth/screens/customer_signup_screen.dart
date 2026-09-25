@@ -34,6 +34,7 @@ class _CustomerSignupScreenState extends ConsumerState<CustomerSignupScreen> {
   }
 
   Future<void> _send() async {
+    if (_loading || _resendSeconds > 0) return;
     final repo = ref.read(authRepositoryProvider);
     final normalizedEmail = repo.normalizeEmail(_email.text);
     if (_name.text.trim().length < 2 || !normalizedEmail.contains('@')) {
@@ -41,6 +42,7 @@ class _CustomerSignupScreenState extends ConsumerState<CustomerSignupScreen> {
       return;
     }
     setState(() => _loading = true);
+    _startResendCooldown();
     try {
       await repo.sendCustomerSignupOtp(
             email: normalizedEmail,
@@ -50,7 +52,6 @@ class _CustomerSignupScreenState extends ConsumerState<CustomerSignupScreen> {
       if (!mounted) return;
       _email.text = normalizedEmail;
       setState(() => _sent = true);
-      _startResendCooldown();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Código enviado. Usa únicamente el correo más reciente.'),
@@ -59,6 +60,14 @@ class _CustomerSignupScreenState extends ConsumerState<CustomerSignupScreen> {
       );
     } catch (e) {
       if (!mounted) return;
+      final deliveryUncertain =
+          e is AuthFlowException && e.deliveryUncertain;
+      if (deliveryUncertain) {
+        _email.text = normalizedEmail;
+        setState(() => _sent = true);
+      } else {
+        _resetResendCooldown();
+      }
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString()), backgroundColor: Colors.red));
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -66,17 +75,31 @@ class _CustomerSignupScreenState extends ConsumerState<CustomerSignupScreen> {
   }
 
   Future<void> _verify() async {
+    if (_loading) return;
     if (_code.text.trim().length != 6) return;
     setState(() => _loading = true);
     try {
       final repo = ref.read(authRepositoryProvider);
       await repo.verifyOtp(repo.normalizeEmail(_email.text), _code.text.trim());
       final profile = await repo.getAccessProfile(forceRefresh: true);
-      if (profile?['role'] != 'customer') {
+      if (profile == null) {
+        await repo.signOut();
+        if (mounted) {
+          setState(() {
+            _sent = false;
+            _code.clear();
+          });
+        }
+        throw const AuthFlowException(
+          'La cuenta se verificó, pero no encontramos su perfil. Contacta a soporte.',
+        );
+      }
+      if (profile['role'] != 'customer') {
         // The email may already belong to an admin or professional. Only
         // disclose that after the user has proved access to the mailbox.
         await repo.signOut();
         if (!mounted) return;
+        ref.invalidate(appAccessProvider);
         setState(() {
           _sent = false;
           _code.clear();
@@ -118,12 +141,18 @@ class _CustomerSignupScreenState extends ConsumerState<CustomerSignupScreen> {
     });
   }
 
+  void _resetResendCooldown() {
+    _resendTimer?.cancel();
+    setState(() => _resendSeconds = 0);
+  }
+
   Future<void> _resend() async {
     if (_loading || _resendSeconds > 0) return;
     final repo = ref.read(authRepositoryProvider);
     final normalizedEmail = repo.normalizeEmail(_email.text);
 
     setState(() => _loading = true);
+    _startResendCooldown();
     try {
       await repo.sendCustomerSignupOtp(
         email: normalizedEmail,
@@ -132,7 +161,6 @@ class _CustomerSignupScreenState extends ConsumerState<CustomerSignupScreen> {
       );
       _code.clear();
       if (!mounted) return;
-      _startResendCooldown();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Nuevo código enviado. Usa únicamente el correo más reciente.'),
@@ -141,6 +169,9 @@ class _CustomerSignupScreenState extends ConsumerState<CustomerSignupScreen> {
       );
     } catch (e) {
       if (!mounted) return;
+      if (e is! AuthFlowException || !e.deliveryUncertain) {
+        _resetResendCooldown();
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
       );
