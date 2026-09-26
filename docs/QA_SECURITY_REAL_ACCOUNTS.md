@@ -25,3 +25,11 @@ transferencia ni marcar como pagada una liquidacion.
 
 Las consultas Flutter de cliente filtran tambien por client_id/customer_id;
 las politicas RLS permanecen como barrera de servidor.
+
+## Resultados confirmados el 2026-09-26
+
+- Controles SQL con roles simulados: cliente ve pago propio y no ve pagos ajenos ni liquidaciones; profesional ve solo sus ganancias y su liquidacion, no la comision FIXIS; administrador ve todos los pagos y liquidaciones.
+- En iPhone 15 Pro, la cuenta cliente Jhony Torres no muestra servicios de Maria Jose; el usuario confirma la ausencia. Capturas de Jhony muestran su perfil, reseña propia 3/5, servicio propio tuberia dañada y mensaje de pago confirmado.
+- La compilacion actual de iPhone 15 Pro muestra el texto de pago corregido. QA Android con compilacion actual sigue abierto por separado.
+
+La prueba no marca como pagada ninguna liquidacion al profesional.
