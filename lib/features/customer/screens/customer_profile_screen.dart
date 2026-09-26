@@ -89,6 +89,11 @@ class _CustomerProfileScreenState
             final createdAt =
                 DateTime.tryParse(profile?['created_at']?.toString() ?? '');
             final avatarUrl = profile?['avatar_url']?.toString();
+            final ratingsCount =
+                (ratingsAsync.value?['ratings_received'] as num?)?.toInt() ?? 0;
+            final rating = double.tryParse(
+              ratingsAsync.value?['average_score']?.toString() ?? '',
+            );
   
             final jobs = jobsAsync.value ?? const <Map<String, dynamic>>[];
             final completed = jobs.where((job) {
@@ -115,6 +120,8 @@ class _CustomerProfileScreenState
                       : () => _showAvatarSourceSheet(user.id),
                   activeJobs: active,
                   completedJobs: completed,
+                  ratingsCount: ratingsCount,
+                  rating: rating,
                 ),
                 const SizedBox(height: 24),
                 FixisSectionHeader(
@@ -200,14 +207,6 @@ class _CustomerProfileScreenState
                     ),
                   ],
                 ),
-                if ((ratingsAsync.value?['ratings_received'] as num? ?? 0) > 0) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    'Calificación recibida: ${ratingsAsync.value?['average_score']} / 5 '
-                    '(${ratingsAsync.value?['ratings_received']} opiniones)',
-                    style: const TextStyle(color: AppTheme.darkSlate),
-                  ),
-                ],
                 const SizedBox(height: 24),
                 const FixisSectionHeader(
                   title: 'Cuenta',
@@ -843,6 +842,8 @@ class _IdentityHero extends StatelessWidget {
   final VoidCallback? onAvatarTap;
   final int activeJobs;
   final int completedJobs;
+  final int ratingsCount;
+  final double? rating;
 
   const _IdentityHero({
     required this.name,
@@ -852,6 +853,8 @@ class _IdentityHero extends StatelessWidget {
     required this.onAvatarTap,
     required this.activeJobs,
     required this.completedJobs,
+    required this.ratingsCount,
+    required this.rating,
   });
 
   @override
@@ -999,6 +1002,31 @@ class _IdentityHero extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(13),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.055),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.star_rounded, color: AppTheme.warning, size: 24),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    ratingsCount == 0 || rating == null
+                        ? 'Aún sin calificaciones'
+                        : '${rating!.toStringAsFixed(2)} / 5 · '
+                          '$ratingsCount ${ratingsCount == 1 ? 'opinión' : 'opiniones'}',
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
