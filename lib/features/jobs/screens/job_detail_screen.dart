@@ -1624,17 +1624,10 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
         const SizedBox(height: 14),
         SizedBox(
           width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => JobRatingScreen(
-                  jobId: _job['id'].toString(),
-                  recipientLabel: 'tu cliente',
-                ),
-              ),
-            ),
-            icon: const Icon(Icons.star_outline_rounded),
-            label: const Text('Calificar al cliente'),
+          child: JobRatingActionButton(
+            jobId: _job['id'].toString(),
+            recipientLabel: 'tu cliente',
+            rateLabel: 'Calificar al cliente',
           ),
         ),
       ],
