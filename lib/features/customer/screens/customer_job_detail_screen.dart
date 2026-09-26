@@ -261,7 +261,7 @@ class _CustomerJobDetailScreenState extends ConsumerState<CustomerJobDetailScree
                     ),
                   ],
                   if (status == 'customer_approved') ...[
-                    _actionInfo('Servicio confirmado', 'FIXIS confirmó el pago y el servicio quedó cerrado financieramente.', Icons.verified, Colors.green),
+                    _actionInfo('Servicio confirmado', 'FIXIS confirmó tu pago y el servicio quedó completado.', Icons.verified, Colors.green),
                     const SizedBox(height: 16),
                     JobRatingActionButton(
                       jobId: widget.jobId,
