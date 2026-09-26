@@ -215,15 +215,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-              // Logo de la App
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryOrange,
-                  borderRadius: BorderRadius.circular(24),
+              // Mismo símbolo FIXIS que en el icono de la aplicación.
+              Center(
+                child: Image.asset(
+                  'assets/logo.png',
+                  width: 104,
+                  height: 104,
+                  fit: BoxFit.contain,
+                  semanticLabel: 'FIXIS',
                 ),
-                child: const Icon(Icons.handyman, color: Colors.white, size: 40),
               ),
               const SizedBox(height: 32),
               
