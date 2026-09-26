@@ -124,6 +124,20 @@ class _CustomerProfileScreenState
                   ratingsCount: ratingsCount,
                   rating: rating,
                 ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const ReceivedRatingsScreen(),
+                    ),
+                  ),
+                  icon: Image.asset(
+                    'assets/rating_wrench_orange.png',
+                    width: 22,
+                    height: 22,
+                  ),
+                  label: const Text('Leer reseñas recibidas'),
+                ),
                 const SizedBox(height: 24),
                 FixisSectionHeader(
                   title: 'Datos personales',
