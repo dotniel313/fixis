@@ -10,7 +10,18 @@ import '../../../core/theme/theme.dart';
 import '../../../core/widgets/fixis_ui.dart';
 import '../../auth/providers/auth_repository.dart';
 import '../../auth/screens/login_screen.dart';
+import '../../ratings/providers/ratings_repository.dart';
 import '../providers/customer_repository.dart';
+
+final customerLoyaltyProvider =
+    FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
+  final result = await Supabase.instance.client.rpc('get_customer_loyalty_summary');
+  if (result is List && result.isNotEmpty) {
+    return Map<String, dynamic>.from(result.first as Map);
+  }
+  if (result is Map) return Map<String, dynamic>.from(result);
+  return {'paid_services': 0, 'categories_used': 0};
+});
 
 class CustomerProfileScreen extends ConsumerStatefulWidget {
   const CustomerProfileScreen({super.key});
@@ -29,6 +40,8 @@ class _CustomerProfileScreenState
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(userProfileProvider);
     final jobsAsync = ref.watch(myCustomerJobsProvider);
+    final loyaltyAsync = ref.watch(customerLoyaltyProvider);
+    final ratingsAsync = ref.watch(receivedRatingsProvider);
     final user = ref.read(authRepositoryProvider).currentUser;
 
     return Scaffold(
@@ -187,6 +200,14 @@ class _CustomerProfileScreenState
                     ),
                   ],
                 ),
+                if ((ratingsAsync.value?['ratings_received'] as num? ?? 0) > 0) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    'Calificación recibida: ${ratingsAsync.value?['average_score']} / 5 '
+                    '(${ratingsAsync.value?['ratings_received']} opiniones)',
+                    style: const TextStyle(color: AppTheme.darkSlate),
+                  ),
+                ],
                 const SizedBox(height: 24),
                 const FixisSectionHeader(
                   title: 'Cuenta',
@@ -251,30 +272,37 @@ class _CustomerProfileScreenState
                 const SizedBox(height: 24),
                 const FixisSectionHeader(
                   title: 'Fidelización FIXIS',
-                  subtitle: 'Base preparada para campañas y beneficios',
+                  subtitle: 'Actividad confirmada de tu cuenta',
                 ),
                 const SizedBox(height: 10),
                 FixisSurface(
                   shadows: const [],
                   border: Border.all(color: AppTheme.slate200),
-                  child: const Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.card_giftcard_rounded,
-                        color: AppTheme.primaryOrange,
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Tu perfil ya queda preparado para futuras campañas, beneficios y segmentación. Los puntos o recompensas se activarán únicamente cuando exista una regla real en el sistema.',
-                          style: TextStyle(
-                            color: AppTheme.slate700,
-                            height: 1.45,
+                  child: loyaltyAsync.when(
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (_, __) => const Text(
+                      'No pudimos cargar tu progreso. Desliza para actualizar.',
+                    ),
+                    data: (data) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${data['paid_services'] ?? 0} servicios pagados · '
+                          '${data['categories_used'] ?? 0} categorías',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: AppTheme.darkSlate,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Tu progreso cuenta únicamente servicios con pago confirmado. '
+                          'Los beneficios y descuentos se anunciarán cuando FIXIS defina sus reglas.',
+                          style: TextStyle(color: AppTheme.slate700, height: 1.45),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
