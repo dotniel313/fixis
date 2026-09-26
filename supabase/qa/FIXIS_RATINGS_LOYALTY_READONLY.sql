@@ -39,11 +39,11 @@ SELECT
     ) duplicated) AS duplicate_ratings;
 
 -- Despues de aplicar 034: nombre/foto disponibles solo mediante RPC para
--- participantes autenticados de un servicio pagado.
+-- participantes autenticados de un servicio pagado (la comprobacion de pertenencia es interna).
 SELECT
     to_regprocedure('public.get_rating_recipient(uuid)') IS NOT NULL
         AS rating_recipient_rpc,
     has_function_privilege('anon', 'public.get_rating_recipient(uuid)', 'EXECUTE') = false
         AS anon_cannot_get_recipient,
     has_function_privilege('authenticated', 'public.get_rating_recipient(uuid)', 'EXECUTE') = true
-        AS participant_can_request_recipient;
+        AS authenticated_can_call_recipient_rpc;
