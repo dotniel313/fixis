@@ -283,26 +283,43 @@ class _CustomerProfileScreenState
                     error: (_, __) => const Text(
                       'No pudimos cargar tu progreso. Desliza para actualizar.',
                     ),
-                    data: (data) => Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${data['paid_services'] ?? 0} servicios pagados · '
-                          '${data['categories_used'] ?? 0} categorías',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: AppTheme.darkSlate,
-                            fontWeight: FontWeight.bold,
+                    data: (data) {
+                      final paid = (data['paid_services'] as num?)?.toInt() ?? 0;
+                      final level = paid >= 10
+                          ? 'Cliente habitual'
+                          : paid >= 3
+                              ? 'Cliente recurrente'
+                              : 'Primeros servicios';
+                      final nextGoal = paid >= 10 ? null : (paid >= 3 ? 10 : 3);
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$paid servicios pagados · '
+                            '${data['categories_used'] ?? 0} categorías',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: AppTheme.darkSlate,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Tu progreso cuenta únicamente servicios con pago confirmado. '
-                          'Los beneficios y descuentos se anunciarán cuando FIXIS defina sus reglas.',
-                          style: TextStyle(color: AppTheme.slate700, height: 1.45),
-                        ),
-                      ],
-                    ),
+                          const SizedBox(height: 10),
+                          Text('Reconocimiento: $level'),
+                          if (nextGoal != null) ...[
+                            const SizedBox(height: 8),
+                            LinearProgressIndicator(value: paid / nextGoal),
+                            const SizedBox(height: 4),
+                            Text('Te faltan ${nextGoal - paid} servicios pagados para el próximo reconocimiento.'),
+                          ],
+                          const SizedBox(height: 10),
+                          const Text(
+                            'El progreso cuenta solo pagos confirmados. '
+                            'Estos reconocimientos no representan dinero, descuentos ni canjes.',
+                            style: TextStyle(color: AppTheme.slate700, height: 1.45),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(height: 24),
