@@ -19,7 +19,27 @@ final completedProfessionalJobsProvider =
       .eq('status', 'customer_approved')
       .order('created_at', ascending: false)
       .limit(20);
-  return List<Map<String, dynamic>>.from(rows);
+  final jobs = List<Map<String, dynamic>>.from(rows);
+  if (jobs.isEmpty) return jobs;
+
+  // One query for the visible jobs; a rating failure must not hide history.
+  Set<String>? ratedJobIds;
+  try {
+    final ratingRows = await client
+        .from('job_ratings')
+        .select('job_id')
+        .eq('reviewer_id', user.id)
+        .inFilter('job_id', jobs.map((job) => job['id'].toString()).toList());
+    ratedJobIds = ratingRows.map((row) => row['job_id'].toString()).toSet();
+  } catch (_) {
+    ratedJobIds = null;
+  }
+  return jobs.map((job) {
+    return {
+      ...job,
+      'rated_by_me': ratedJobIds?.contains(job['id'].toString()),
+    };
+  }).toList();
 });
 
 class ProfessionalActivityScreen extends ConsumerWidget {
@@ -214,16 +234,48 @@ class ProfessionalActivityScreen extends ConsumerWidget {
               data: (jobs) => jobs.isEmpty
                   ? const Text('Todavía no tienes servicios confirmados.')
                   : Column(
-                      children: jobs.map((job) => ListTile(
-                        title: Text(job['title']?.toString() ?? 'Servicio'),
-                        subtitle: const Text('Pago confirmado'),
-                        trailing: const Icon(Icons.star_outline_rounded),
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => JobDetailScreen(job: job),
+                      children: jobs.map((job) {
+                        final rated = job['rated_by_me'] as bool?;
+                        return ListTile(
+                          title: Text(job['title']?.toString() ?? 'Servicio'),
+                          subtitle: Text(
+                            rated == true
+                                ? 'Pago confirmado · Cliente calificado'
+                                : rated == false
+                                    ? 'Pago confirmado · Calificación pendiente'
+                                    : 'Pago confirmado',
                           ),
-                        ),
-                      )).toList(),
+                          trailing: Semantics(
+                            label: rated == true
+                                ? 'Cliente calificado'
+                                : rated == false
+                                    ? 'Cliente pendiente de calificación'
+                                    : 'Estado de calificación no disponible',
+                            child: Image.asset(
+                              'assets/rating_wrench_orange.png',
+                              width: 26,
+                              height: 26,
+                              color: rated == true
+                                  ? AppTheme.primaryOrange
+                                  : rated == false
+                                      ? AppTheme.slate500
+                                      : AppTheme.slate200,
+                              colorBlendMode: BlendMode.srcIn,
+                              excludeFromSemantics: true,
+                            ),
+                          ),
+                          onTap: () async {
+                            await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => JobDetailScreen(job: job),
+                              ),
+                            );
+                            if (context.mounted) {
+                              ref.invalidate(completedProfessionalJobsProvider);
+                            }
+                          },
+                        );
+                      }).toList(),
                     ),
             ),
           ],
