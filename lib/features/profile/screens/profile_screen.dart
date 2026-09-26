@@ -169,7 +169,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 if (ratingsCount > 0) ...[
                   const SizedBox(height: 8),
-                  Text('$ratingsCount calificaciones recibidas'),
+                  Text('$ratingsCount ${ratingsCount == 1 ? 'calificación recibida' : 'calificaciones recibidas'}'),
                 ],
                 const SizedBox(height: 12),
                 OutlinedButton.icon(
@@ -601,6 +601,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     AppTheme.warning,
                     rating,
                     'Calificación',
+                    useRatingWrench: true,
                   ),
                 ),
                 Container(
@@ -697,14 +698,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     IconData icon,
     Color color,
     String value,
-    String label,
-  ) {
+    String label, {
+    bool useRatingWrench = false,
+  }) {
     return Column(
       children: [
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: color, size: 19),
+            useRatingWrench
+                ? Image.asset(
+                    'assets/rating_wrench_orange.png',
+                    width: 19,
+                    height: 19,
+                    color: color,
+                    colorBlendMode: BlendMode.srcIn,
+                  )
+                : Icon(icon, color: color, size: 19),
             const SizedBox(width: 5),
             Text(
               value,
