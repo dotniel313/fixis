@@ -129,7 +129,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             final name = profile?['full_name']?.toString() ?? 'Profesional FIXIS';
             final category = profile?['category']?.toString() ?? 'Especialista';
             final phone = profile?['phone']?.toString() ?? 'Sin número';
-            final rating = profile?['rating']?.toString() ?? '5.00';
+            final rating = profile?['rating']?.toString() ?? '—';
             final jobs = profile?['total_jobs']?.toString() ?? '0';
             final avatarUrl = profile?['avatar_url']?.toString();
             final city =
