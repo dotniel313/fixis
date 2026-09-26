@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/theme.dart';
+import '../../ratings/screens/job_rating_screen.dart';
 import '../providers/jobs_repository.dart';
 import 'create_quote_screen.dart';
 import 'quote_summary_screen.dart';
@@ -1573,50 +1574,70 @@ class _JobDetailScreenState extends ConsumerState<JobDetailScreen> {
   Widget _buildCustomerApprovedState() {
     final snapshot = _financialSnapshot;
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.green.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.green.withValues(alpha: 0.25)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.green.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: Colors.green.withValues(alpha: 0.25)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.verified_rounded, color: Colors.green),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Servicio confirmado',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.darkSlate,
+              const Row(
+                children: [
+                  Icon(Icons.verified_rounded, color: Colors.green),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Servicio confirmado',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.darkSlate,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
+              const SizedBox(height: 14),
+              if (snapshot != null) ...[
+                _financialRow('Servicio', _snapshotAmount('gross_amount')),
+                const SizedBox(height: 8),
+                _financialRow('Comisión FIXIS', _snapshotAmount('commission_amount')),
+                const Divider(height: 24),
+                _financialRow(
+                  'Tu ingreso',
+                  _snapshotAmount('professional_amount'),
+                  emphasized: true,
+                ),
+              ] else
+                const Text(
+                  'El servicio fue confirmado. Actualiza la pantalla para cargar el resumen financiero.',
+                  style: TextStyle(color: Colors.grey, height: 1.4),
+                ),
             ],
           ),
-          const SizedBox(height: 14),
-          if (snapshot != null) ...[
-            _financialRow('Servicio', _snapshotAmount('gross_amount')),
-            const SizedBox(height: 8),
-            _financialRow('Comisión FIXIS', _snapshotAmount('commission_amount')),
-            const Divider(height: 24),
-            _financialRow(
-              'Tu ingreso',
-              _snapshotAmount('professional_amount'),
-              emphasized: true,
+        ),
+        const SizedBox(height: 14),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => JobRatingScreen(
+                  jobId: _job['id'].toString(),
+                  recipientLabel: 'tu cliente',
+                ),
+              ),
             ),
-          ] else
-            const Text(
-              'El servicio fue confirmado. Actualiza la pantalla para cargar el resumen financiero.',
-              style: TextStyle(color: Colors.grey, height: 1.4),
-            ),
-        ],
-      ),
+            icon: const Icon(Icons.star_outline_rounded),
+            label: const Text('Calificar al cliente'),
+          ),
+        ),
+      ],
     );
   }
 
