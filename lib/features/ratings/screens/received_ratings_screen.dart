@@ -24,28 +24,8 @@ class _ReceivedRatingsScreenState extends State<ReceivedRatingsScreen> {
     final client = Supabase.instance.client;
     final user = client.auth.currentUser;
     if (user == null) throw StateError('Inicia sesión para ver tus reseñas.');
-    final rows = await client
-        .from('job_ratings')
-        .select('job_id, score, comment, created_at, reviewer_role')
-        .eq('reviewed_id', user.id)
-        .order('created_at', ascending: false)
-        .limit(50);
-    final ratings = List<Map<String, dynamic>>.from(rows);
-    if (ratings.isEmpty) return ratings;
-
-    // Jobs is protected by its own RLS; use only titles the viewer may read.
-    final jobs = await client
-        .from('jobs')
-        .select('id, title')
-        .inFilter('id', ratings.map((r) => r['job_id'].toString()).toList());
-    final titles = {
-      for (final job in jobs)
-        job['id'].toString(): job['title']?.toString() ?? 'Servicio FIXIS',
-    };
-    return ratings.map((rating) => {
-      ...rating,
-      'job_title': titles[rating['job_id'].toString()] ?? 'Servicio FIXIS',
-    }).toList();
+    final rows = await client.rpc('get_my_received_reviews');
+    return List<Map<String, dynamic>>.from(rows as List);
   }
 
   Future<void> _refresh() async {
@@ -134,6 +114,14 @@ class _ReceivedRatingsScreenState extends State<ReceivedRatingsScreen> {
                           ? 'Cliente'
                           : 'FIXI';
                       final comment = rating['comment']?.toString().trim();
+                      final reviewerName = rating['reviewer_name']?.toString().trim();
+                      final displayName = reviewerName == null || reviewerName.isEmpty
+                          ? (role == 'Cliente' ? 'Cliente FIXIS' : 'Profesional FIXIS')
+                          : reviewerName;
+                      final avatar = rating['reviewer_avatar_url']?.toString();
+                      final avatarUri = avatar == null ? null : Uri.tryParse(avatar);
+                      final showAvatar = avatarUri?.scheme == 'https' &&
+                          avatarUri?.host.isNotEmpty == true;
                       final date = DateTime.tryParse(
                         rating['created_at']?.toString() ?? '',
                       )?.toLocal();
@@ -146,6 +134,51 @@ class _ReceivedRatingsScreenState extends State<ReceivedRatingsScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 22,
+                                    backgroundColor: AppTheme.primaryOrange,
+                                    child: ClipOval(
+                                      child: showAvatar
+                                          ? Image.network(
+                                              avatar!,
+                                              width: 44,
+                                              height: 44,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) =>
+                                                  const Icon(Icons.person, color: Colors.white),
+                                            )
+                                          : const Icon(Icons.person, color: Colors.white),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          displayName,
+                                          style: const TextStyle(
+                                            color: AppTheme.darkSlate,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                        Text(
+                                          date == null
+                                              ? role
+                                              : '$role · ${date.day}/${date.month}/${date.year}',
+                                          style: const TextStyle(
+                                            color: AppTheme.slate500,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
                               Text(
                                 rating['job_title']?.toString() ?? 'Servicio FIXIS',
                                 style: const TextStyle(
@@ -180,16 +213,7 @@ class _ReceivedRatingsScreenState extends State<ReceivedRatingsScreen> {
                                   height: 1.4,
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                date == null
-                                    ? 'Opinión de $role'
-                                    : 'Opinión de $role · ${date.day}/${date.month}/${date.year}',
-                                style: const TextStyle(
-                                  color: AppTheme.slate500,
-                                  fontSize: 12,
-                                ),
-                              ),
+
                             ],
                           ),
                         ),
