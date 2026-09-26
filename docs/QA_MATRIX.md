@@ -36,8 +36,8 @@ Ultima actualizacion: 2026-09-26
 | Radar a distancia | PASS | Usuario reporta deteccion y uso del radar entre Android en Quito y Santo Domingo a distancia superior a 25 km; no equivale a verificar precision GPS ni prevencion de ubicacion simulada |
 | Acceso y servicio entre dispositivos | PASS | Tres iPhone y dos Android usados en pruebas; cuenta usada en Quito pudo ingresar en otro dispositivo en Santo Domingo y recorrer servicio hasta pago del cliente |
 | Ratings/Loyalty backend preflight | PASS | Usuario aplico migraciones 033 y 034; 2026-09-26: siete indicadores true, anomalias y duplicados en cero, y tres indicadores true para RPC de identidad; repetir tras QA fisico |
-| Calificacion cliente a FIXI | PASS | 2026-09-26: captura Android muestra a Daniel Orellana con foto, 5 llaves seleccionadas y luego calificacion guardada con comentario; migraciones 033/034 y CI aprobadas |
-| Calificacion FIXI a cliente | PENDING | 2026-09-26: captura iPhone muestra calificacion de 5 llaves guardada con comentario para Maria Jama y silueta esperada sin foto; falta conciliacion por servicio en BD, comprobar segundo intento y acceso de terceros |
+| Calificacion cliente a FIXI | PASS | 2026-09-26: Android muestra a Daniel Orellana con foto y calificacion de 5 llaves guardada; SQL confirma una calificacion del cliente en el servicio 9a051626 |
+| Calificacion FIXI a cliente | PASS | 2026-09-26: iPhone muestra 5 llaves guardadas para Maria Jama y silueta esperada sin foto; SQL confirma una calificacion del FIXI en el mismo servicio 9a051626; quedan como pruebas complementarias reingreso y acceso de terceros |
 | Fidelizacion cliente | PENDING | Migracion 033 aplicada; RPC verificada; perfil muestra servicios pagados, categorias y reconocimientos a 3 y 10 pagos; falta compilar y validar en cuenta real; sin descuentos ni canjes |
 | Nivel FIXIS profesional | PENDING | Pantalla lee expert_gamification y suma servicios confirmados; promedio de calificaciones recibidas preparado en perfil; faltan validar progreso y calificaciones en dispositivos; beneficios o rangos adicionales sin definir |
 | Finance Regression | PENDING | Dos pagos conciliados; corte semanal en processing sin debito; billetera profesional confirma saldo disponible cero, ganancias reservadas y retirado cero; migracion 032 y build iOS release verificados por usuario: referencia requerida, notas opcionales; textos de billetera corregidos en codigo, falta compilar nueva version, transferencia real y cierre paid |
@@ -64,5 +64,5 @@ Ultima actualizacion: 2026-09-26
 La version no puede pasar a release mientras Revised Quote Flow,
 Finance Regression, Security Regression y QA fisico permanezcan en PENDING
 o BLOCKED. Calificacion bilateral y fidelizacion basada en actividad pagada estan
-implementadas en la rama; migraciones 033/034 aplicadas y preflight aprobado; CI compilo APK debug, pendientes instalacion y QA fisico.
+implementadas en la rama; migraciones 033/034 aplicadas y preflight aprobado; CI compilo APK debug, instalacion realizada y calificacion bilateral probada en iPhone/Android; otras rutas fisicas pendientes.
 No se habilitan descuentos, puntos monetarios ni canjes sin reglas comerciales.
