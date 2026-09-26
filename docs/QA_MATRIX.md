@@ -16,6 +16,7 @@ Ultima actualizacion: 2026-09-26
 | Flutter Analyze | PENDING | CI anterior paso en 37a8e50; ejecutar de nuevo en Mac tras incorporar calificaciones y fidelizacion de la migracion 033 |
 | Flutter Test | BLOCKED | No existen tests automatizados suficientes |
 | Android Debug Build | PASS | CI en 37a8e50 con .env de prueba; usuario reporta APK actualizado funcionando el 2026-09-25 |
+| Iconos FIXIS Android/iOS/web y login | PENDING | Logo y llave incorporados al proyecto; ejecutar `flutter pub get` y `dart run flutter_launcher_icons`, comprobar visualmente en dispositivos y reconstruir instalaciones | 
 | Android Release Bundle | PENDING | Configuracion de firma preparada en ae7aef3; requiere clave privada, .env real y compilacion firmada |
 | Android Physical QA | PENDING | Acceso y radar reportados en dos Android, uno en Santo Domingo y otro en Quito, a distancia superior a 25 km segun usuario; una misma cuenta ingreso despues desde otro dispositivo y se completo el servicio hasta pago; faltan calificacion, fidelizacion y rutas adicionales |
 | iOS Build | PASS | Compilacion e instalacion mediante flutter run en iPhone 15 |
