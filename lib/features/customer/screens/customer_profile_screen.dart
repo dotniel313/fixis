@@ -1031,7 +1031,13 @@ class _IdentityHero extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.star_rounded, color: AppTheme.warning, size: 24),
+                Image.asset(
+                  'assets/rating_wrench_orange.png',
+                  width: 24,
+                  height: 24,
+                  color: AppTheme.warning,
+                  colorBlendMode: BlendMode.srcIn,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
