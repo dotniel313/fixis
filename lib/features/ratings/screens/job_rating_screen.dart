@@ -71,7 +71,7 @@ class _JobRatingActionButtonState extends State<JobRatingActionButton> {
           onPressed: _openRating,
           icon: Icon(saved ? Icons.rate_review_rounded : Icons.star_outline_rounded),
           label: Text(
-            snapshot.hasError
+            snapshot.connectionState != ConnectionState.done || snapshot.hasError
                 ? 'Ver calificación del servicio'
                 : saved
                     ? 'Ver mi calificación'
