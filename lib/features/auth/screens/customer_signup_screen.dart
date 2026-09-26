@@ -190,7 +190,15 @@ class _CustomerSignupScreenState extends ConsumerState<CustomerSignupScreen> {
         child: ListView(
           padding: const EdgeInsets.all(24),
           children: [
-            const Icon(Icons.home_repair_service, size: 58, color: AppTheme.primaryOrange),
+            Center(
+              child: Image.asset(
+                'assets/logo.png',
+                width: 72,
+                height: 72,
+                fit: BoxFit.contain,
+                semanticLabel: 'FIXIS',
+              ),
+            ),
             const SizedBox(height: 18),
             Text(_sent ? 'Verifica tu correo' : 'Únete a FIXIS', textAlign: TextAlign.center, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800)),
             const SizedBox(height: 8),
