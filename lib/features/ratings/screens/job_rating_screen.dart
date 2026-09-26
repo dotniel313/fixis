@@ -210,7 +210,19 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
-      appBar: AppBar(title: const Text('Opiniones del servicio')),
+      appBar: AppBar(
+        title: const Text('Opiniones del servicio'),
+        actions: [
+          IconButton(
+            tooltip: 'Actualizar opiniones',
+            icon: const Icon(Icons.refresh_rounded),
+            onPressed: () => setState(() {
+              _existingRating = _loadRating();
+              _receivedRating = _loadReceivedRating();
+            }),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: FutureBuilder<Map<String, dynamic>?>(
           future: _existingRating,
@@ -280,6 +292,7 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
                     score: (saved['score'] as num?)?.toInt() ?? 0,
                     comment: saved['comment']?.toString(),
                     caption: 'Esta opinión quedó registrada para este servicio.',
+                    noCommentLabel: 'No dejé un comentario.',
                   ),
                 ] else ...[
                   const Text('Califica de 1 a 5 llaves'),
@@ -376,12 +389,14 @@ class _OpinionCard extends StatelessWidget {
   final int score;
   final String? comment;
   final String caption;
+  final String noCommentLabel;
 
   const _OpinionCard({
     required this.title,
     required this.score,
     required this.comment,
     required this.caption,
+    this.noCommentLabel = 'No dejó un comentario.',
   });
 
   @override
@@ -422,7 +437,7 @@ class _OpinionCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            text == null || text.isEmpty ? 'No dejó un comentario.' : text,
+            text == null || text.isEmpty ? noCommentLabel : text,
             style: const TextStyle(color: AppTheme.slate700, height: 1.4),
           ),
           const SizedBox(height: 12),
