@@ -1,16 +1,17 @@
--- FIXIS: solo lectura. Ejecutar TODO el bloque en una sola corrida
--- desde Supabase SQL Editor. Los ajustes de rol/JWT duran esta transaccion.
--- Servicio pagado con calificacion bilateral confirmada: 9a051626...
-BEGIN TRANSACTION READ ONLY;
-
+-- FIXIS: prueba de aislamiento de identidad/calificaciones (solo lecturas de datos).
+-- Ejecutar toda esta unica sentencia DO desde Supabase SQL Editor.
+-- El editor puede separar sentencias y perder SET LOCAL entre consultas.
+-- Un "Success. No rows returned" significa que TODAS las condiciones pasaron.
+-- Si falla, el error QA_* identifica exactamente la comprobacion fallida.
 DO $$
 DECLARE
     v_third_party uuid;
+    v_job_id uuid := '9a051626-61c8-466a-90d8-71bc87304f1f'::uuid;
 BEGIN
+    -- La eleccion de la cuenta ocurre antes de adoptar el rol autenticado.
     SELECT p.id INTO v_third_party
     FROM public.profiles p
-    JOIN public.jobs j
-      ON j.id = '9a051626-61c8-466a-90d8-71bc87304f1f'::uuid
+    JOIN public.jobs j ON j.id = v_job_id
     WHERE p.account_status = 'active'
       AND p.id IS DISTINCT FROM j.client_id
       AND p.id IS DISTINCT FROM j.assigned_pro_id
@@ -20,22 +21,22 @@ BEGIN
     IF v_third_party IS NULL THEN
         RAISE EXCEPTION 'QA_REQUIRES_ACTIVE_THIRD_PARTY_ACCOUNT';
     END IF;
+
     PERFORM set_config('request.jwt.claim.sub', v_third_party::text, true);
+    EXECUTE 'SET LOCAL ROLE authenticated';
+
+    IF current_user <> 'authenticated' OR auth.uid() IS DISTINCT FROM v_third_party THEN
+        RAISE EXCEPTION 'QA_IMPERSONATION_FAILED';
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM public.get_rating_recipient(v_job_id)) THEN
+        RAISE EXCEPTION 'QA_THIRD_PARTY_CAN_SEE_RECIPIENT';
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM public.job_ratings WHERE job_id = v_job_id) THEN
+        RAISE EXCEPTION 'QA_THIRD_PARTY_CAN_SEE_RATINGS';
+    END IF;
+
+    RAISE NOTICE 'QA_OK: tercero autenticado sin acceso a identidad ni calificaciones';
 END;
 $$;
-
-SET LOCAL ROLE authenticated;
-
-SELECT
-    auth.uid() IS NOT NULL AS tercero_simulado,
-    NOT EXISTS (
-        SELECT 1
-        FROM public.get_rating_recipient(
-          '9a051626-61c8-466a-90d8-71bc87304f1f'::uuid)
-    ) AS tercero_no_ve_identidad,
-    NOT EXISTS (
-        SELECT 1 FROM public.job_ratings
-        WHERE job_id = '9a051626-61c8-466a-90d8-71bc87304f1f'::uuid
-    ) AS tercero_no_ve_calificaciones;
-
-ROLLBACK;
