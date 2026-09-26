@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/fixis_ui.dart';
 import '../../jobs/providers/jobs_repository.dart';
 import '../../jobs/screens/job_detail_screen.dart';
+
+final completedProfessionalJobsProvider =
+    FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  final client = Supabase.instance.client;
+  final user = client.auth.currentUser;
+  if (user == null) return const [];
+  final rows = await client
+      .from('jobs')
+      .select('id, title, status, created_at, assigned_pro_id')
+      .eq('assigned_pro_id', user.id)
+      .eq('status', 'customer_approved')
+      .order('created_at', ascending: false)
+      .limit(20);
+  return List<Map<String, dynamic>>.from(rows);
+});
 
 class ProfessionalActivityScreen extends ConsumerWidget {
   const ProfessionalActivityScreen({super.key});
@@ -12,6 +28,7 @@ class ProfessionalActivityScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activeAsync = ref.watch(myActiveJobsStreamProvider);
+    final completedAsync = ref.watch(completedProfessionalJobsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -184,6 +201,30 @@ class ProfessionalActivityScreen extends ConsumerWidget {
                   ],
                 );
               },
+            ),
+            const SizedBox(height: 24),
+            const FixisSectionHeader(
+              title: 'Servicios confirmados',
+              subtitle: 'Abre un servicio para calificar al cliente',
+            ),
+            const SizedBox(height: 12),
+            completedAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (_, __) => const Text('No pudimos cargar el historial.'),
+              data: (jobs) => jobs.isEmpty
+                  ? const Text('Todavía no tienes servicios confirmados.')
+                  : Column(
+                      children: jobs.map((job) => ListTile(
+                        title: Text(job['title']?.toString() ?? 'Servicio'),
+                        subtitle: const Text('Pago confirmado'),
+                        trailing: const Icon(Icons.star_outline_rounded),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => JobDetailScreen(job: job),
+                          ),
+                        ),
+                      )).toList(),
+                    ),
             ),
           ],
         ),
