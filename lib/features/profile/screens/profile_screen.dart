@@ -171,6 +171,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   const SizedBox(height: 8),
                   Text('$ratingsCount calificaciones recibidas'),
                 ],
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const ReceivedRatingsScreen(),
+                    ),
+                  ),
+                  icon: Image.asset(
+                    'assets/rating_wrench_orange.png',
+                    width: 22,
+                    height: 22,
+                  ),
+                  label: const Text('Leer reseñas recibidas'),
+                ),
                 const SizedBox(height: 18),
                 _buildLevelShortcut(context),
                 const SizedBox(height: 24),
