@@ -13,9 +13,9 @@ Ultima actualizacion: 2026-09-26
 
 | Area | Estado | Evidencia |
 |---|---|---|
-| Flutter Analyze | PENDING | CI anterior paso en 37a8e50; ejecutar de nuevo en Mac tras incorporar calificaciones y fidelizacion de la migracion 033 |
+| Flutter Analyze | PASS | CI 36254445169 aprobo flutter analyze tras incorporar calificaciones, fidelizacion, iconos y la pantalla de nombre/foto |
 | Flutter Test | BLOCKED | No existen tests automatizados suficientes |
-| Android Debug Build | PASS | CI en 37a8e50 con .env de prueba; usuario reporta APK actualizado funcionando el 2026-09-25 |
+| Android Debug Build | PASS | CI 36254445169 genero iconos, analizo y compilo APK debug con .env de prueba; compilacion release y QA fisico siguen pendientes |
 | Iconos FIXIS Android/iOS/web y login | PENDING | Logo y llave incorporados al proyecto; ejecutar `flutter pub get` y `dart run flutter_launcher_icons`, comprobar visualmente en dispositivos y reconstruir instalaciones | 
 | Android Release Bundle | PENDING | Configuracion de firma preparada en ae7aef3; requiere clave privada, .env real y compilacion firmada |
 | Android Physical QA | PENDING | Acceso y radar reportados en dos Android, uno en Santo Domingo y otro en Quito, a distancia superior a 25 km segun usuario; una misma cuenta ingreso despues desde otro dispositivo y se completo el servicio hasta pago; faltan calificacion, fidelizacion y rutas adicionales |
@@ -35,9 +35,9 @@ Ultima actualizacion: 2026-09-26
 | Cross-device Safe Areas | PENDING | 23 pantallas auditadas; validar Redmi Note 12, iPhone 15 y iPhone 15 Pro |
 | Radar a distancia | PASS | Usuario reporta deteccion y uso del radar entre Android en Quito y Santo Domingo a distancia superior a 25 km; no equivale a verificar precision GPS ni prevencion de ubicacion simulada |
 | Acceso y servicio entre dispositivos | PASS | Tres iPhone y dos Android usados en pruebas; cuenta usada en Quito pudo ingresar en otro dispositivo en Santo Domingo y recorrer servicio hasta pago del cliente |
-| Ratings/Loyalty backend preflight | PASS | Usuario aplico migracion 033 con Success; siete indicadores true, anomalias y duplicados en cero antes de crear calificaciones; repetir tras QA fisico |
-| Calificacion cliente a FIXI | PENDING | Migracion 033 aplicada; backend y permisos validados por usuario (7 indicadores true); migracion 034 para identidad/foto preparada, pendiente de aplicar y comprobar en cuenta real, calificacion y compilacion |
-| Calificacion FIXI a cliente | PENDING | Migracion 033 aplicada; historial profesional y pantalla con nombre/foto preparadas; migracion 034 y QA bilateral fisico pendientes, incluido segundo intento y acceso de terceros |
+| Ratings/Loyalty backend preflight | PASS | Usuario aplico migraciones 033 y 034; 2026-09-26: siete indicadores true, anomalias y duplicados en cero, y tres indicadores true para RPC de identidad; repetir tras QA fisico |
+| Calificacion cliente a FIXI | PENDING | Migracion 033 aplicada; backend y permisos validados por usuario (7 indicadores true); migracion 034 aplicada y preflight aprobado; CI aprobo analisis y APK debug; pendientes calificacion y visualizacion en cuenta real |
+| Calificacion FIXI a cliente | PENDING | Migracion 033 aplicada; historial profesional y pantalla con nombre/foto preparadas; migracion 034 aplicada y preflight aprobado; QA bilateral fisico pendiente, incluido segundo intento y acceso de terceros |
 | Fidelizacion cliente | PENDING | Migracion 033 aplicada; RPC verificada; perfil muestra servicios pagados, categorias y reconocimientos a 3 y 10 pagos; falta compilar y validar en cuenta real; sin descuentos ni canjes |
 | Nivel FIXIS profesional | PENDING | Pantalla lee expert_gamification y suma servicios confirmados; promedio de calificaciones recibidas preparado en perfil; faltan validar progreso y calificaciones en dispositivos; beneficios o rangos adicionales sin definir |
 | Finance Regression | PENDING | Dos pagos conciliados; corte semanal en processing sin debito; billetera profesional confirma saldo disponible cero, ganancias reservadas y retirado cero; migracion 032 y build iOS release verificados por usuario: referencia requerida, notas opcionales; textos de billetera corregidos en codigo, falta compilar nueva version, transferencia real y cierre paid |
@@ -64,5 +64,5 @@ Ultima actualizacion: 2026-09-26
 La version no puede pasar a release mientras Revised Quote Flow,
 Finance Regression, Security Regression y QA fisico permanezcan en PENDING
 o BLOCKED. Calificacion bilateral y fidelizacion basada en actividad pagada estan
-implementadas en la rama; migracion 033 aplicada y preflight aprobado, pendientes de compilacion y QA fisico.
+implementadas en la rama; migraciones 033/034 aplicadas y preflight aprobado; CI compilo APK debug, pendientes instalacion y QA fisico.
 No se habilitan descuentos, puntos monetarios ni canjes sin reglas comerciales.
