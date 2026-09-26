@@ -284,6 +284,8 @@ class _CustomerProfileScreenState
                     ),
                     data: (data) {
                       final paid = (data['paid_services'] as num?)?.toInt() ?? 0;
+                      final categories =
+                          (data['categories_used'] as num?)?.toInt() ?? 0;
                       final level = paid >= 10
                           ? 'Cliente habitual'
                           : paid >= 3
@@ -294,8 +296,8 @@ class _CustomerProfileScreenState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '$paid servicios pagados · '
-                            '${data['categories_used'] ?? 0} categorías',
+                            '$paid ${paid == 1 ? 'servicio pagado' : 'servicios pagados'} · '
+                            '$categories ${categories == 1 ? 'categoría' : 'categorías'}',
                             style: const TextStyle(
                               fontSize: 18,
                               color: AppTheme.darkSlate,
