@@ -263,17 +263,10 @@ class _CustomerJobDetailScreenState extends ConsumerState<CustomerJobDetailScree
                   if (status == 'customer_approved') ...[
                     _actionInfo('Servicio confirmado', 'FIXIS confirmó el pago y el servicio quedó cerrado financieramente.', Icons.verified, Colors.green),
                     const SizedBox(height: 16),
-                    OutlinedButton.icon(
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => JobRatingScreen(
-                            jobId: widget.jobId,
-                            recipientLabel: 'tu FIXI',
-                          ),
-                        ),
-                      ),
-                      icon: const Icon(Icons.star_outline_rounded),
-                      label: const Text('Calificar al FIXI'),
+                    JobRatingActionButton(
+                      jobId: widget.jobId,
+                      recipientLabel: 'tu FIXI',
+                      rateLabel: 'Calificar al FIXI',
                     ),
                   ],
                 ],
