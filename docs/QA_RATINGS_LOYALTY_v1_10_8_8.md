@@ -22,6 +22,7 @@
 - Aislamiento de identidad y reseñas: simulación de tercero y prueba física con dos cuentas distintas confirmadas. En iPhone, el FIXI ve la reseña recibida con nombre, foto y comentario.
 - Fidelización cliente: una cuenta Android muestra 1 servicio pagado, 1 categoría y progreso hacia el reconocimiento de 3 pagos. El rango profesional Inicial muestra 2/5 servicios.
 - Migración 035: primera consulta de permisos `true/true/true` y aislamiento de tercero `true/true`, confirmados en Supabase el 2026-09-26.
-- Pendiente: pantalla de reseñas recibidas en cliente y Android; umbrales de 3 y 10 pagos; aislamiento físico de trabajos y pagos, y repetición de los conteos tras nuevas calificaciones.
+- Reseñas recibidas: pantalla FIXI verificada en iPhone y pantalla cliente verificada en Android con identidad y foto del autor, comentario y calificación. QA de este recorrido `PASS` el 2026-09-26.
+- Pendiente: umbrales de fidelización de 3 y 10 pagos; aislamiento físico de trabajos y pagos, y repetición de los conteos tras nuevas calificaciones.
 
 La liquidación del profesional es un flujo financiero independiente. No marcar producción lista hasta cerrar los controles financieros y de seguridad de `docs/QA_MATRIX.md`.
