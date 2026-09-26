@@ -34,10 +34,10 @@ Ultima actualizacion: 2026-09-26
 | Cross-device Safe Areas | PENDING | 23 pantallas auditadas; validar Redmi Note 12, iPhone 15 y iPhone 15 Pro |
 | Radar a distancia | PASS | Usuario reporta deteccion y uso del radar entre Android en Quito y Santo Domingo a distancia superior a 25 km; no equivale a verificar precision GPS ni prevencion de ubicacion simulada |
 | Acceso y servicio entre dispositivos | PASS | Tres iPhone y dos Android usados en pruebas; cuenta usada en Quito pudo ingresar en otro dispositivo en Santo Domingo y recorrer servicio hasta pago del cliente |
-| Calificacion cliente a FIXI | PENDING | Sin formulario, tabla o RPC de calificacion por trabajo en la rama revisada; requiere persistencia, control de una calificacion por autor/trabajo y prueba con cuentas reales |
-| Calificacion FIXI a cliente | PENDING | Sin flujo ni persistencia de calificacion reciproca por trabajo; perfil profesional muestra valor real si existe y guion si falta, sin inventar 5.00 |
-| Fidelizacion cliente | PENDING | Perfil muestra seccion informativa para futuras campanas; no hay reglas de puntos, recompensas o canje implementadas |
-| Nivel FIXIS profesional | PENDING | Pantalla lee expert_gamification y suma servicios confirmados; falta validar progreso en dispositivos y definir beneficios o rangos adicionales antes de ofrecerlos |
+| Calificacion cliente a FIXI | PENDING | Migracion 033, RPC y pantalla en detalle del servicio preparados en GitHub; falta aplicar migracion, compilar e ingresar como cliente para calificar un pago confirmado |
+| Calificacion FIXI a cliente | PENDING | Migracion 033, historial profesional y pantalla de calificacion preparados; falta aplicacion y QA bilateral fisico, incluyendo segundo intento y autorizacion de terceros |
+| Fidelizacion cliente | PENDING | RPC y perfil preparados para mostrar servicios pagados y categorias reales sin puntos monetarios; faltan migracion 033 y QA con pagos reales; descuentos y canjes requieren reglas comerciales |
+| Nivel FIXIS profesional | PENDING | Pantalla lee expert_gamification y suma servicios confirmados; promedio de calificaciones recibidas preparado en perfil; faltan validar progreso y calificaciones en dispositivos; beneficios o rangos adicionales sin definir |
 | Finance Regression | PENDING | Dos pagos conciliados; corte semanal en processing sin debito; billetera profesional confirma saldo disponible cero, ganancias reservadas y retirado cero; migracion 032 y build iOS release verificados por usuario: referencia requerida, notas opcionales; textos de billetera corregidos en codigo, falta compilar nueva version, transferencia real y cierre paid |
 | Security Regression | PENDING | RLS activo en ocho tablas y permisos RPC correctos; simulaciones SQL de customer, professional y admin pasan; accesos reales reportados en cinco telefonos, incluida misma cuenta en otro dispositivo; falta comprobar aislamiento entre cuentas con sesiones reales |
 | Login / Signup Android actualizado | PENDING | Acceso con cuentas reales reportado en dos Android y reutilizacion de una cuenta en otro dispositivo; faltan pruebas separadas de alta, OTP por rol, correo ya usado y reenvio |
@@ -61,6 +61,6 @@ Ultima actualizacion: 2026-09-26
 
 La version no puede pasar a release mientras Revised Quote Flow,
 Finance Regression, Security Regression y QA fisico permanezcan en PENDING
-o BLOCKED. Calificacion bilateral y fidelizacion quedan identificadas como
-funciones pendientes; definir expresamente si forman parte del alcance de
-este lanzamiento antes de declarar el producto completo.
+o BLOCKED. Calificacion bilateral y fidelizacion basada en actividad pagada estan
+implementadas en la rama, pendientes de migracion 033, compilacion y QA fisico.
+No se habilitan descuentos, puntos monetarios ni canjes sin reglas comerciales.
