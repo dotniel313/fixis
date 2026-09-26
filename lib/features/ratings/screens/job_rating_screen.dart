@@ -118,7 +118,7 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
                 const SizedBox(height: 16),
                 if (saved != null) ...[
                   Text(
-                    '${saved['score']} de 5 estrellas',
+                    '${saved['score']} de 5 llaves',
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   if (saved['comment'] != null) ...[
@@ -128,19 +128,24 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
                   const SizedBox(height: 12),
                   const Text('Gracias. Esta calificación quedó registrada para este servicio.'),
                 ] else ...[
+                  const Text('Califica de 1 a 5 llaves'),
+                  const SizedBox(height: 8),
                   Wrap(
                     children: List.generate(5, (index) {
                       return IconButton(
-                        tooltip: '${index + 1} estrellas',
+                        tooltip: '${index + 1} de 5 llaves',
                         onPressed: _sending ? null : () => setState(() => _score = index + 1),
-                        icon: Icon(
-                          index < _score ? Icons.star_rounded : Icons.star_border_rounded,
-                          size: 38,
-                          color: AppTheme.warning,
+                        icon: Image.asset(
+                          'assets/rating_wrench_orange.png',
+                          width: 36,
+                          height: 36,
+                          color: index < _score ? AppTheme.primaryOrange : Colors.grey.shade400,
+                          colorBlendMode: BlendMode.srcIn,
                         ),
                       );
                     }),
                   ),
+                  if (_score > 0) Text('$_score de 5 llaves seleccionadas'),
                   const SizedBox(height: 18),
                   TextField(
                     controller: _comment,
