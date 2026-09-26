@@ -16,6 +16,11 @@
 6. En perfil del cliente, el número de servicios pagados y categorías debe corresponder a la base. Los reconocimientos se calculan a partir de ese contador: desde 3, **Cliente recurrente**; desde 10, **Cliente habitual**. No hay saldo, descuentos ni canjes.
 7. Si un pago deja de estar `paid` por reembolso, el contador de fidelización deja de incluir ese pago. Las calificaciones históricas permanecen registradas.
 
-## Condición de cierre
+## Avance confirmado el 2026-09-26
 
-Mantener calificación bilateral y fidelización en `PENDING` hasta completar ambos recorridos con usuarios reales, verificar aislamiento de identidad y repetir los chequeos de lectura. La liquidación del profesional es un flujo financiero independiente.
+- Cliente a FIXI y FIXI a cliente: ambos recorridos guardados para el mismo servicio, con calificación visible en los perfiles respectivos.
+- Aislamiento de identidad y reseñas: simulación de tercero y prueba física con dos cuentas distintas confirmadas. En iPhone, el FIXI ve la reseña recibida con nombre, foto y comentario.
+- Fidelización cliente: una cuenta Android muestra 1 servicio pagado, 1 categoría y progreso hacia el reconocimiento de 3 pagos. El rango profesional Inicial muestra 2/5 servicios.
+- Pendiente: primera consulta de permisos de `supabase/qa/FIXIS_RECEIVED_REVIEWS_READONLY.sql`; pantalla de reseñas recibidas en cliente y Android; umbrales de 3 y 10 pagos; aislamiento físico de trabajos y pagos, y repetición de los conteos tras nuevas calificaciones.
+
+La liquidación del profesional es un flujo financiero independiente. No marcar producción lista hasta cerrar los controles financieros y de seguridad de `docs/QA_MATRIX.md`.
