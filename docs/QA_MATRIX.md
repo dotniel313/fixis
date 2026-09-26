@@ -18,10 +18,10 @@ Ultima actualizacion: 2026-09-26
 | Android Debug Build | PASS | CI 36254445169 genero iconos, analizo y compilo APK debug con .env de prueba; compilacion release y QA fisico siguen pendientes |
 | Iconos FIXIS Android/iOS/web y login | PENDING | Logo y llave incorporados al proyecto; ejecutar `flutter pub get` y `dart run flutter_launcher_icons`, comprobar visualmente en dispositivos y reconstruir instalaciones | 
 | Android Release Bundle | PENDING | Configuracion de firma preparada en ae7aef3; requiere clave privada, .env real y compilacion firmada |
-| Android Physical QA | PENDING | Acceso y radar reportados en dos Android, uno en Santo Domingo y otro en Quito, a distancia superior a 25 km segun usuario; una misma cuenta ingreso despues desde otro dispositivo y se completo el servicio hasta pago; faltan calificacion, fidelizacion y rutas adicionales |
+| Android Physical QA | PENDING | Acceso y radar reportados en dos Android, uno en Santo Domingo y otro en Quito, a distancia superior a 25 km segun usuario; una misma cuenta ingreso despues desde otro dispositivo y se completo el servicio hasta pago; calificacion cliente a FIXI probada en Android; faltan fidelizacion y rutas adicionales |
 | iOS Build | PASS | Compilacion e instalacion mediante flutter run en iPhone 15 |
 | iOS Install/Launch Smoke | PASS | 2026-09-25: usuario confirma que build release abre con normalidad desde icono en iPhone 15 Pro sin depurador; informe del fallo al reabrir muestra build debug |
-| iOS Physical QA | PENDING | Acceso en tres iPhone, flujo hasta pago y arranque release sin depurador reportados; faltan calificacion bilateral, fidelizacion y rutas adicionales por rol |
+| iOS Physical QA | PENDING | Acceso en tres iPhone, flujo hasta pago y arranque release sin depurador reportados; calificacion FIXI a cliente probada en iPhone; faltan fidelizacion y rutas adicionales por rol |
 | iOS Login OTP | PENDING | Acceso a las cuentas probado en tres iPhone; no consta evidencia separada de envio/reenvio OTP, codigo ni persistencia de sesion para todos los roles |
 | iOS Admin despues de autorizacion de pago | PASS | Administrador verifico el pago por transferencia bancaria del cliente tras completar el flujo en tres telefonos; liquidacion al profesional aun no transferida |
 | Supabase Transactional Reset | PASS | docs/QA_TRANSACTIONAL_RESET_v1.10.8.7.md |
