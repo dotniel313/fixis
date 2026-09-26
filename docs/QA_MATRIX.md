@@ -16,7 +16,7 @@ Ultima actualizacion: 2026-09-26
 | Flutter Analyze | PASS | CI 36254445169 aprobo flutter analyze tras incorporar calificaciones, fidelizacion, iconos y la pantalla de nombre/foto |
 | Flutter Test | BLOCKED | No existen tests automatizados suficientes |
 | Android Debug Build | PASS | CI 36254445169 genero iconos, analizo y compilo APK debug con .env de prueba; compilacion release y QA fisico siguen pendientes |
-| Iconos FIXIS Android/iOS/web y login | PENDING | 2026-09-26: se detecto que el icono iOS versionado seguia siendo el predeterminado de Flutter; se incorporaron los iconos FIXIS generados para iOS, Android y web a la rama. Falta actualizar e instalar en iPhone 15 y comprobar el icono en pantalla de inicio | 
+| Iconos FIXIS Android/iOS/web y login | PENDING | 2026-09-26: se detecto que el icono iOS versionado seguia siendo el predeterminado de Flutter; se incorporaron los iconos FIXIS generados para iOS, Android y web a la rama. Usuario reporta que ya actualizo/reinstalo en iPhone 15; confirmar expresamente que el icono FIXIS aparezca en pantalla de inicio antes de marcar PASS | 
 | Android Release Bundle | PENDING | Configuracion de firma preparada en ae7aef3; requiere clave privada, .env real y compilacion firmada |
 | Android Physical QA | PENDING | Acceso y radar reportados en dos Android, uno en Santo Domingo y otro en Quito, a distancia superior a 25 km segun usuario; una misma cuenta ingreso despues desde otro dispositivo y se completo el servicio hasta pago; calificacion cliente a FIXI probada en Android; faltan fidelizacion y rutas adicionales |
 | iOS Build | PASS | Compilacion e instalacion mediante flutter run en iPhone 15 |
