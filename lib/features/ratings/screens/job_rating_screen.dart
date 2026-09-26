@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/fixis_ui.dart';
 
 class JobRatingActionButton extends StatefulWidget {
   final String jobId;
@@ -69,12 +70,18 @@ class _JobRatingActionButtonState extends State<JobRatingActionButton> {
         final saved = snapshot.data == true;
         return OutlinedButton.icon(
           onPressed: _openRating,
-          icon: Icon(saved ? Icons.rate_review_rounded : Icons.star_outline_rounded),
+          icon: Image.asset(
+            'assets/rating_wrench_orange.png',
+            width: 22,
+            height: 22,
+            color: saved ? AppTheme.primaryOrange : AppTheme.slate500,
+            colorBlendMode: BlendMode.srcIn,
+          ),
           label: Text(
             snapshot.connectionState != ConnectionState.done || snapshot.hasError
-                ? 'Ver calificación del servicio'
+                ? 'Opiniones del servicio'
                 : saved
-                    ? 'Ver mi calificación'
+                    ? 'Ver opinión que envié'
                     : widget.rateLabel,
           ),
         );
@@ -100,6 +107,7 @@ class JobRatingScreen extends StatefulWidget {
 class _JobRatingScreenState extends State<JobRatingScreen> {
   final _comment = TextEditingController();
   late Future<Map<String, dynamic>?> _existingRating;
+  late Future<Map<String, dynamic>?> _receivedRating;
   late Future<Map<String, dynamic>?> _recipient;
   int _score = 0;
   bool _sending = false;
@@ -109,6 +117,7 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
   void initState() {
     super.initState();
     _existingRating = _loadRating();
+    _receivedRating = _loadReceivedRating();
     _recipient = _loadRecipient();
   }
 
@@ -127,6 +136,19 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
         .select('score, comment, created_at')
         .eq('job_id', widget.jobId)
         .eq('reviewer_id', user.id)
+        .maybeSingle();
+    return row == null ? null : Map<String, dynamic>.from(row);
+  }
+
+  Future<Map<String, dynamic>?> _loadReceivedRating() async {
+    final client = Supabase.instance.client;
+    final user = client.auth.currentUser;
+    if (user == null) throw StateError('Inicia sesión para ver tus opiniones.');
+    final row = await client
+        .from('job_ratings')
+        .select('score, comment, created_at')
+        .eq('job_id', widget.jobId)
+        .eq('reviewed_id', user.id)
         .maybeSingle();
     return row == null ? null : Map<String, dynamic>.from(row);
   }
@@ -157,7 +179,10 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
         },
       );
       if (!mounted) return;
-      setState(() => _submitted = Map<String, dynamic>.from(row as Map));
+      setState(() {
+        _submitted = Map<String, dynamic>.from(row as Map);
+        _receivedRating = _loadReceivedRating();
+      });
     } on PostgrestException catch (error) {
       if (!mounted) return;
       final message = switch (error.message) {
@@ -185,7 +210,7 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
-      appBar: AppBar(title: const Text('Calificar servicio')),
+      appBar: AppBar(title: const Text('Opiniones del servicio')),
       body: SafeArea(
         child: FutureBuilder<Map<String, dynamic>?>(
           future: _existingRating,
@@ -200,7 +225,7 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
             }
             final saved = _submitted ?? snapshot.data;
             return ListView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
               children: [
                 FutureBuilder<Map<String, dynamic>?>(
                   future: _recipient,
@@ -237,7 +262,7 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
                           child: Text(
                             saved == null
                                 ? '¿Cómo fue tu experiencia con $label?'
-                                : 'Tu calificación para $label',
+                                : 'Tu opinión enviada a $label',
                             style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w800,
@@ -250,16 +275,12 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
                 ),
                 const SizedBox(height: 16),
                 if (saved != null) ...[
-                  Text(
-                    '${saved['score']} de 5 llaves',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  _OpinionCard(
+                    title: 'Opinión que envié',
+                    score: (saved['score'] as num?)?.toInt() ?? 0,
+                    comment: saved['comment']?.toString(),
+                    caption: 'Esta opinión quedó registrada para este servicio.',
                   ),
-                  if (saved['comment'] != null) ...[
-                    const SizedBox(height: 12),
-                    Text(saved['comment'].toString()),
-                  ],
-                  const SizedBox(height: 12),
-                  const Text('Gracias. Esta calificación quedó registrada para este servicio.'),
                 ] else ...[
                   const Text('Califica de 1 a 5 llaves'),
                   const SizedBox(height: 8),
@@ -297,10 +318,119 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
                   const SizedBox(height: 8),
                   const Text('Solo puedes calificar una vez este servicio confirmado.'),
                 ],
+                const SizedBox(height: 28),
+                FutureBuilder<Map<String, dynamic>?>(
+                  future: _receivedRating,
+                  builder: (context, receivedSnapshot) {
+                    if (receivedSnapshot.connectionState != ConnectionState.done) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (receivedSnapshot.hasError) {
+                      return const Text(
+                        'No pudimos consultar la opinión recibida. Vuelve a abrir este servicio.',
+                      );
+                    }
+                    final received = receivedSnapshot.data;
+                    if (received == null) {
+                      return FixisSurface(
+                        shadows: const [],
+                        border: Border.all(color: AppTheme.slate200),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Opinión que recibí',
+                              style: TextStyle(
+                                color: AppTheme.darkSlate,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Todavía no recibiste una opinión de ${widget.recipientLabel} sobre este servicio.',
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return _OpinionCard(
+                      title: 'Opinión que recibí',
+                      score: (received['score'] as num?)?.toInt() ?? 0,
+                      comment: received['comment']?.toString(),
+                      caption: 'Así te calificó ${widget.recipientLabel} en este servicio.',
+                    );
+                  },
+                ),
               ],
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+class _OpinionCard extends StatelessWidget {
+  final String title;
+  final int score;
+  final String? comment;
+  final String caption;
+
+  const _OpinionCard({
+    required this.title,
+    required this.score,
+    required this.comment,
+    required this.caption,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final text = comment?.trim();
+    return FixisSurface(
+      shadows: const [],
+      border: Border.all(color: AppTheme.slate200),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: AppTheme.darkSlate,
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              ...List.generate(
+                5,
+                (index) => Image.asset(
+                  'assets/rating_wrench_orange.png',
+                  width: 27,
+                  height: 27,
+                  color: index < score
+                      ? AppTheme.primaryOrange
+                      : AppTheme.slate200,
+                  colorBlendMode: BlendMode.srcIn,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text('$score/5'),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            text == null || text.isEmpty ? 'No dejó un comentario.' : text,
+            style: const TextStyle(color: AppTheme.slate700, height: 1.4),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            caption,
+            style: const TextStyle(color: AppTheme.slate500, fontSize: 12),
+          ),
+        ],
       ),
     );
   }
