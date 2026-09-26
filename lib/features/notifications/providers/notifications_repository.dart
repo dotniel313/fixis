@@ -15,6 +15,7 @@ final myNotificationsStreamProvider =
   return Supabase.instance.client
       .from('notifications')
       .stream(primaryKey: ['id'])
+      .eq('user_id', user.id)
       .order('created_at', ascending: false)
       .map(
         (rows) => rows
