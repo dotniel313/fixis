@@ -118,7 +118,7 @@ class _ReceivedRatingsScreenState extends State<ReceivedRatingsScreen> {
                   const SizedBox(height: 22),
                   const FixisSectionHeader(
                     title: 'Tus reseñas',
-                    subtitle: 'Solo tú puedes leer las opiniones de tus servicios',
+                    subtitle: 'Opiniones que recibiste por tus servicios',
                   ),
                   const SizedBox(height: 12),
                   if (ratings.isEmpty)
