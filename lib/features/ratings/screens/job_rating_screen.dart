@@ -3,6 +3,86 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/theme/theme.dart';
 
+class JobRatingActionButton extends StatefulWidget {
+  final String jobId;
+  final String recipientLabel;
+  final String rateLabel;
+
+  const JobRatingActionButton({
+    super.key,
+    required this.jobId,
+    required this.recipientLabel,
+    required this.rateLabel,
+  });
+
+  @override
+  State<JobRatingActionButton> createState() => _JobRatingActionButtonState();
+}
+
+class _JobRatingActionButtonState extends State<JobRatingActionButton> {
+  late Future<bool> _hasRating;
+
+  @override
+  void initState() {
+    super.initState();
+    _hasRating = _loadHasRating();
+  }
+
+  @override
+  void didUpdateWidget(covariant JobRatingActionButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.jobId != widget.jobId) {
+      _hasRating = _loadHasRating();
+    }
+  }
+
+  Future<bool> _loadHasRating() async {
+    final client = Supabase.instance.client;
+    final user = client.auth.currentUser;
+    if (user == null) return false;
+    final row = await client
+        .from('job_ratings')
+        .select('id')
+        .eq('job_id', widget.jobId)
+        .eq('reviewer_id', user.id)
+        .maybeSingle();
+    return row != null;
+  }
+
+  Future<void> _openRating() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => JobRatingScreen(
+          jobId: widget.jobId,
+          recipientLabel: widget.recipientLabel,
+        ),
+      ),
+    );
+    if (mounted) setState(() => _hasRating = _loadHasRating());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: _hasRating,
+      builder: (context, snapshot) {
+        final saved = snapshot.data == true;
+        return OutlinedButton.icon(
+          onPressed: _openRating,
+          icon: Icon(saved ? Icons.rate_review_rounded : Icons.star_outline_rounded),
+          label: Text(
+            snapshot.hasError
+                ? 'Ver calificación del servicio'
+                : saved
+                    ? 'Ver mi calificación'
+                    : widget.rateLabel,
+          ),
+        );
+      },
+    );
+  }
+}
+
 class JobRatingScreen extends StatefulWidget {
   final String jobId;
   final String recipientLabel;
