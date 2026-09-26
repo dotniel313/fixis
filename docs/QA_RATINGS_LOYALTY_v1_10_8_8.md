@@ -2,9 +2,9 @@
 
 ## Instalación
 
-1. Migración 033 ya aplicada y verificada. Aplicar `supabase/migrations/034_rating_recipient_identity_v1_10_8_8.sql` una sola vez para mostrar el nombre y la foto de quien recibe la calificación.
-2. Ejecutar `supabase/qa/FIXIS_RATINGS_LOYALTY_READONLY.sql`: los siete indicadores del primer bloque deben ser `true`; los dos conteos del segundo, cero; y los tres indicadores del tercer bloque, `true` después de la migración 034.
-3. Actualizar la rama en el Mac, ejecutar `flutter analyze` y compilar la app de cliente y profesional. Esta etapa no se ha ejecutado desde el entorno de edición.
+1. Migraciones 033 y 034 aplicadas. El 2026-09-26 el usuario confirmo los siete `true` del bloque 1, dos ceros del bloque 2 y tres `true` del bloque 3.
+2. Repetir `supabase/qa/FIXIS_RATINGS_LOYALTY_READONLY.sql` tras las pruebas de calificacion: siete `true` en bloque 1, dos ceros en bloque 2 y tres `true` en bloque 3.
+3. CI 36254445169 paso el generador de iconos, `flutter analyze` y `flutter build apk --debug` con `.env` de prueba. Falta instalar una compilacion actualizada en dispositivos reales y validar ambos roles.
 
 ## Recorrido con cuentas reales
 
@@ -18,4 +18,4 @@
 
 ## Condición de cierre
 
-Mantener calificación bilateral y fidelización en `PENDING` hasta aplicar 034, aprobar `flutter analyze` y completar ambos recorridos con usuarios reales. La liquidación del profesional es un flujo financiero independiente.
+Mantener calificación bilateral y fidelización en `PENDING` hasta completar ambos recorridos con usuarios reales, verificar aislamiento de identidad y repetir los chequeos de lectura. La liquidación del profesional es un flujo financiero independiente.
