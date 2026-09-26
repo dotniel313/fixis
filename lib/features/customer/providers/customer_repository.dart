@@ -17,9 +17,12 @@ class CustomerRepository {
   CustomerRepository(this._supabase);
 
   Future<List<Map<String, dynamic>>> getMyJobs() async {
+    final customerId = _supabase.auth.currentUser?.id;
+    if (customerId == null) return const [];
     final rows = await _supabase
         .from('jobs')
         .select()
+        .eq('client_id', customerId)
         .order('created_at', ascending: false);
 
     return (rows as List)
@@ -81,10 +84,13 @@ class CustomerRepository {
   }
 
   Future<Map<String, dynamic>?> getJob(String jobId) async {
+    final customerId = _supabase.auth.currentUser?.id;
+    if (customerId == null) return null;
     final row = await _supabase
         .from('jobs')
         .select()
         .eq('id', jobId)
+        .eq('client_id', customerId)
         .maybeSingle();
     return row == null ? null : Map<String, dynamic>.from(row);
   }
@@ -137,10 +143,13 @@ class CustomerRepository {
   }
 
   Future<Map<String, dynamic>?> getPaymentForJob(String jobId) async {
+    final customerId = _supabase.auth.currentUser?.id;
+    if (customerId == null) return null;
     final row = await _supabase
         .from('payments')
         .select()
         .eq('job_id', jobId)
+        .eq('customer_id', customerId)
         .maybeSingle();
 
     return row == null ? null : Map<String, dynamic>.from(row);
