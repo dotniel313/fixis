@@ -1,6 +1,6 @@
 # FIXIS — QA Matrix
 
-Ultima actualizacion: 2026-09-25
+Ultima actualizacion: 2026-09-26
 
 ## Estados
 
@@ -33,7 +33,7 @@ Ultima actualizacion: 2026-09-25
 | Revision Notification FIXI | PENDING | Evento persistente e in-app preparado; falta QA fisico |
 | Cross-device Safe Areas | PENDING | 23 pantallas auditadas; validar Redmi Note 12, iPhone 15 y iPhone 15 Pro |
 | Finance Regression | PENDING | Dos pagos conciliados; corte semanal en processing sin debito; billetera profesional confirma saldo disponible cero, ganancias reservadas y retirado cero; migracion 032 y build iOS release verificados por usuario: referencia requerida, notas opcionales; textos de billetera corregidos en codigo, falta compilar nueva version, transferencia real y cierre paid |
-| Security Regression | PENDING | RLS activo en ocho tablas y permisos RPC correctos; simulaciones SQL de customer y professional pasan: aislamiento de pagos, liquidaciones y comision FIXIS; faltan admin y pruebas con sesiones reales |
+| Security Regression | PENDING | RLS activo en ocho tablas y permisos RPC correctos; simulaciones SQL de customer y professional pasan: aislamiento de pagos, liquidaciones y comision FIXIS; simulacion SQL de admin pasa: ve todos los pagos y liquidaciones; faltan pruebas con sesiones reales |
 | Login / Signup Android actualizado | PENDING | Funcionamiento general reportado el 2026-09-25; falta registrar resultados separados: OTP cliente/FIXI/admin, correo existente de otro rol y reenvio |
 
 ## Criterios v1.10.8.6
