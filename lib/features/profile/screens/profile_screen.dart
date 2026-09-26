@@ -11,6 +11,7 @@ import '../../../core/widgets/fixis_ui.dart';
 import '../../auth/providers/auth_repository.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../gamification/screens/gamification_screen.dart';
+import '../../ratings/providers/ratings_repository.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -89,6 +90,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(userProfileProvider);
+    final ratingsAsync = ref.watch(receivedRatingsProvider);
     final user = ref.read(authRepositoryProvider).currentUser;
 
     return Scaffold(
@@ -129,7 +131,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             final name = profile?['full_name']?.toString() ?? 'Profesional FIXIS';
             final category = profile?['category']?.toString() ?? 'Especialista';
             final phone = profile?['phone']?.toString() ?? 'Sin número';
-            final rating = profile?['rating']?.toString() ?? '—';
+            final ratingsCount =
+                (ratingsAsync.value?['ratings_received'] as num?)?.toInt() ?? 0;
+            final rating = ratingsCount == 0
+                ? '—'
+                : ((ratingsAsync.value?['average_score'] as num?)?.toDouble() ?? 0)
+                    .toStringAsFixed(2);
             final jobs = profile?['total_jobs']?.toString() ?? '0';
             final avatarUrl = profile?['avatar_url']?.toString();
             final city =
@@ -159,6 +166,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   jobs: jobs,
                   avatarUrl: avatarUrl,
                 ),
+                if (ratingsCount > 0) ...[
+                  const SizedBox(height: 8),
+                  Text('$ratingsCount calificaciones recibidas'),
+                ],
                 const SizedBox(height: 18),
                 _buildLevelShortcut(context),
                 const SizedBox(height: 24),
