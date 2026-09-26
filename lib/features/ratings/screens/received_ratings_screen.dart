@@ -106,7 +106,7 @@ class _ReceivedRatingsScreenState extends State<ReceivedRatingsScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '${ratings.length} ${ratings.length == 1 ? 'reseña recibida' : 'reseñas recibidas'}',
+                                'Mostrando ${ratings.length} ${ratings.length == 1 ? 'reseña' : 'reseñas'}',
                                 style: const TextStyle(color: Colors.white70),
                               ),
                             ],
