@@ -11,6 +11,7 @@ import '../../../core/widgets/fixis_ui.dart';
 import '../../auth/providers/auth_repository.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../ratings/providers/ratings_repository.dart';
+import '../../ratings/screens/received_ratings_screen.dart';
 import '../providers/customer_repository.dart';
 
 final customerLoyaltyProvider =
