@@ -17,24 +17,24 @@ Ultima actualizacion: 2026-09-26
 | Flutter Test | BLOCKED | No existen tests automatizados suficientes |
 | Android Debug Build | PASS | CI en 37a8e50 con .env de prueba; usuario reporta APK actualizado funcionando el 2026-09-25 |
 | Android Release Bundle | PENDING | Configuracion de firma preparada en ae7aef3; requiere clave privada, .env real y compilacion firmada |
-| Android Physical QA | PENDING | Usuario reporta que funciona el 2026-09-25; faltan evidencias por rol y recorrido funcional completo |
+| Android Physical QA | PENDING | Acceso y radar reportados en dos Android, uno en Santo Domingo y otro en Quito, a distancia superior a 25 km segun usuario; una misma cuenta ingreso despues desde otro dispositivo y se completo el servicio hasta pago; faltan calificacion, fidelizacion y rutas adicionales |
 | iOS Build | PASS | Compilacion e instalacion mediante flutter run en iPhone 15 |
 | iOS Install/Launch Smoke | PASS | 2026-09-25: usuario confirma que build release abre con normalidad desde icono en iPhone 15 Pro sin depurador; informe del fallo al reabrir muestra build debug |
-| iOS Physical QA | PENDING | Flujo de pago en tres telefonos y arranque release sin depurador validados; faltan otras rutas por rol y sesion/reingreso |
-| iOS Login OTP | PENDING | 2026-09-25: acceso del administrador funciona en iPhone 15 Pro release; faltan comprobar por separado envio/codigo OTP y retencion de sesion en todos los roles |
-| iOS Admin despues de autorizacion de pago | PASS | 2026-09-25: usuario confirma que el administrador registro la transferencia tras completar el flujo en los tres telefonos de prueba |
+| iOS Physical QA | PENDING | Acceso en tres iPhone, flujo hasta pago y arranque release sin depurador reportados; faltan calificacion bilateral, fidelizacion y rutas adicionales por rol |
+| iOS Login OTP | PENDING | Acceso a las cuentas probado en tres iPhone; no consta evidencia separada de envio/reenvio OTP, codigo ni persistencia de sesion para todos los roles |
+| iOS Admin despues de autorizacion de pago | PASS | Administrador verifico el pago por transferencia bancaria del cliente tras completar el flujo en tres telefonos; liquidacion al profesional aun no transferida |
 | Supabase Transactional Reset | PASS | docs/QA_TRANSACTIONAL_RESET_v1.10.8.7.md |
 | Backup Transactional | PASS | fixis_backup_reset_20260916 |
 | Clean Database Baseline (2026-09-16) | PASS | Conteos en cero al terminar el reset; no describe el estado actual de la base |
 | Backend Revised Quote / Realtime preflight | PASS | 2026-09-25: siete indicadores true en bloque 1 de supabase/qa/FIXIS_PRODUCTION_READINESS_READONLY.sql, resultado proporcionado desde Supabase |
 | Backend integridad transaccional de lectura | PASS | 2026-09-25: los cinco conteos del bloque 2 siguieron en cero tras registrar la transferencia; resultado proporcionado desde Supabase |
-| Revised Quote Flow | PASS | 2026-09-25: usuario confirma recorrido completo hasta el pago y registro de transferencia por administrador en tres telefonos; otros casos de revision aun requieren prueba |
+| Revised Quote Flow | PASS | Recorrido de cotizacion revisada hasta pago del cliente y verificacion administrativa probado en tres telefonos; otros casos de revision aun requieren prueba |
 | Quote Revision Realtime | PENDING | Migracion 031 y suscripcion Flutter preparadas; verificar aplicacion real y latencia en dispositivos |
 | Revision Notification FIXI | PENDING | Evento persistente e in-app preparado; falta QA fisico |
 | Cross-device Safe Areas | PENDING | 23 pantallas auditadas; validar Redmi Note 12, iPhone 15 y iPhone 15 Pro |
-| Finance Regression | PENDING | Dos pagos conciliados; corte semanal en processing sin debito; billetera profesional confirma saldo disponible cero, ganancias reservadas y retirado cero; migracion 032 y build iOS release verificados por usuario: referencia requerida, notas opcionales; textos de billetera corregidos en codigo, falta compilar nueva version, transferencia real y cierre paid |
-| Security Regression | PENDING | RLS activo en ocho tablas y permisos RPC correctos; simulaciones SQL de customer y professional pasan: aislamiento de pagos, liquidaciones y comision FIXIS; simulacion SQL de admin pasa: ve todos los pagos y liquidaciones; faltan pruebas con sesiones reales |
-| Login / Signup Android actualizado | PENDING | Funcionamiento general reportado el 2026-09-25; falta registrar resultados separados: OTP cliente/FIXI/admin, correo existente de otro rol y reenvio |
+| Radar a distancia | PASS | Usuario reporta deteccion y uso del radar entre Android en Quito y Santo Domingo a distancia superior a 25 km; no equivale a verificar precision GPS ni prevencion de ubicacion simulada |\n| Acceso y servicio entre dispositivos | PASS | Tres iPhone y dos Android usados en pruebas; cuenta usada en Quito pudo ingresar en otro dispositivo en Santo Domingo y recorrer servicio hasta pago del cliente |\n| Calificacion cliente a FIXI | PENDING | Sin formulario, tabla o RPC de calificacion por trabajo en la rama revisada; requiere persistencia, control de una calificacion por autor/trabajo y prueba con cuentas reales |\n| Calificacion FIXI a cliente | PENDING | Sin flujo ni persistencia de calificacion reciproca por trabajo; perfil profesional muestra valor real si existe y guion si falta, sin inventar 5.00 |\n| Fidelizacion cliente | PENDING | Perfil muestra seccion informativa para futuras campanas; no hay reglas de puntos, recompensas o canje implementadas |\n| Nivel FIXIS profesional | PENDING | Pantalla lee expert_gamification y suma servicios confirmados; falta validar progreso en dispositivos y definir beneficios o rangos adicionales antes de ofrecerlos |\n| Finance Regression | PENDING | Dos pagos conciliados; corte semanal en processing sin debito; billetera profesional confirma saldo disponible cero, ganancias reservadas y retirado cero; migracion 032 y build iOS release verificados por usuario: referencia requerida, notas opcionales; textos de billetera corregidos en codigo, falta compilar nueva version, transferencia real y cierre paid |
+| Security Regression | PENDING | RLS activo en ocho tablas y permisos RPC correctos; simulaciones SQL de customer, professional y admin pasan; accesos reales reportados en cinco telefonos, incluida misma cuenta en otro dispositivo; falta comprobar aislamiento entre cuentas con sesiones reales |
+| Login / Signup Android actualizado | PENDING | Acceso con cuentas reales reportado en dos Android y reutilizacion de una cuenta en otro dispositivo; faltan pruebas separadas de alta, OTP por rol, correo ya usado y reenvio |
 
 ## Criterios v1.10.8.6
 
@@ -55,4 +55,6 @@ Ultima actualizacion: 2026-09-26
 
 La version no puede pasar a release mientras Revised Quote Flow,
 Finance Regression, Security Regression y QA fisico permanezcan en PENDING
-o BLOCKED.
+o BLOCKED. Calificacion bilateral y fidelizacion quedan identificadas como
+funciones pendientes; definir expresamente si forman parte del alcance de
+este lanzamiento antes de declarar el producto completo.
