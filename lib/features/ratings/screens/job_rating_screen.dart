@@ -20,6 +20,7 @@ class JobRatingScreen extends StatefulWidget {
 class _JobRatingScreenState extends State<JobRatingScreen> {
   final _comment = TextEditingController();
   late Future<Map<String, dynamic>?> _existingRating;
+  late Future<Map<String, dynamic>?> _recipient;
   int _score = 0;
   bool _sending = false;
   Map<String, dynamic>? _submitted;
@@ -28,6 +29,7 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
   void initState() {
     super.initState();
     _existingRating = _loadRating();
+    _recipient = _loadRecipient();
   }
 
   @override
@@ -47,6 +49,17 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
         .eq('reviewer_id', user.id)
         .maybeSingle();
     return row == null ? null : Map<String, dynamic>.from(row);
+  }
+
+  Future<Map<String, dynamic>?> _loadRecipient() async {
+    final result = await Supabase.instance.client.rpc(
+      'get_rating_recipient',
+      params: {'p_job_id': widget.jobId},
+    );
+    if (result is List && result.isNotEmpty) {
+      return Map<String, dynamic>.from(result.first as Map);
+    }
+    return null;
   }
 
   Future<void> _submit() async {
@@ -109,11 +122,51 @@ class _JobRatingScreenState extends State<JobRatingScreen> {
             return ListView(
               padding: const EdgeInsets.all(24),
               children: [
-                Text(
-                  saved == null
-                      ? '¿Cómo fue tu experiencia con ${widget.recipientLabel}?'
-                      : 'Tu calificación para ${widget.recipientLabel}',
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                FutureBuilder<Map<String, dynamic>?>(
+                  future: _recipient,
+                  builder: (context, recipientSnapshot) {
+                    final recipient = recipientSnapshot.data;
+                    final name = recipient?['recipient_name']?.toString().trim();
+                    final label = name == null || name.isEmpty
+                        ? widget.recipientLabel
+                        : name;
+                    final avatar = recipient?['recipient_avatar_url']?.toString();
+                    final avatarUri = avatar == null ? null : Uri.tryParse(avatar);
+                    final showAvatar = avatarUri?.scheme == 'https' &&
+                        avatarUri?.host.isNotEmpty == true;
+                    return Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 26,
+                          backgroundColor: AppTheme.primaryOrange,
+                          child: ClipOval(
+                            child: showAvatar
+                                ? Image.network(
+                                    avatar!,
+                                    width: 52,
+                                    height: 52,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) =>
+                                        const Icon(Icons.person, color: Colors.white),
+                                  )
+                                : const Icon(Icons.person, color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Text(
+                            saved == null
+                                ? '¿Cómo fue tu experiencia con $label?'
+                                : 'Tu calificación para $label',
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 16),
                 if (saved != null) ...[
