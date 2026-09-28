@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- FIN PERMISOS GPS -->
     <application
-        android:label="fixis_pro"
+        android:label="FIXIS"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
