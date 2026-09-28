@@ -1,6 +1,6 @@
 # FIXIS — QA Matrix
 
-Ultima actualizacion: 2026-09-26
+Ultima actualizacion: 2026-09-28
 
 ## Estados
 
@@ -17,7 +17,9 @@ Ultima actualizacion: 2026-09-26
 | Flutter Test | BLOCKED | No existen tests automatizados suficientes |
 | Android Debug Build | PASS | CI 36254445169 genero iconos, analizo y compilo APK debug con .env de prueba; compilacion release y QA fisico siguen pendientes |
 | Icono FIXIS iOS y logo login | PASS | 2026-09-27: captura de Biblioteca de apps en iPhone muestra icono azul con llave blanca FIXIS instalado; captura anterior confirmo el mismo simbolo en login. Se verificaron assets iOS versionados, evitando que git pull restablezca el icono Flutter |
-| Iconos FIXIS Android y web | PENDING | Assets PNG versionados y generador configurado; falta verificacion visual del icono de launcher Android y del favicon web en version actual |
+| Icono FIXIS Android | PASS | 2026-09-27: captura de dispositivo Android confirma llave blanca sobre fondo azul en el launcher. El nombre visible FIXIS se ajusto despues de esta captura; comprobar al instalar la siguiente compilacion |
+| Favicon del sitio publico FIXIS | PASS | 2026-09-27: captura de Safari en fixis.geotactics.com.ec muestra favicon de llave blanca sobre fondo azul y titulo FIXIS |
+| Identidad de Flutter web | PENDING | favicon e iconos PNG versionados; titulo, nombre de instalacion y descripcion corregidos a FIXIS en web/index.html y web/manifest.json. Falta compilar y comprobar esta app web por separado del sitio publico |
 | Android Release Bundle | PENDING | Configuracion de firma preparada en ae7aef3; requiere clave privada, .env real y compilacion firmada |
 | Android Physical QA | PENDING | Acceso y radar probados entre Android en Santo Domingo y Quito; servicio hasta pago y calificacion cliente a FIXI verificados. Fidelizacion basica y reseña recibida del cliente probadas en Android. 2026-09-26: version actual instalada en Redmi Note 12; captura de detalle de servicio confirmado muestra nuevo texto de pago, boton de opinion completo y espacio inferior suficiente sobre la barra de navegacion. Otras rutas y compilacion release firmada siguen pendientes |
 | iOS Build | PASS | 2026-09-26: usuario actualizo la rama e instalo en iPhone 15 Pro; captura de la compilacion actual muestra el mensaje de pago corregido en el detalle de su servicio |
