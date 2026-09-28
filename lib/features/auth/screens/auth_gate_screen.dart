@@ -18,6 +18,7 @@ class AuthGateScreen extends ConsumerWidget {
     final accessAsync = ref.watch(appAccessProvider);
 
     return accessAsync.when(
+      skipLoadingOnRefresh: false,
       loading: () => const _AccessLoadingScreen(),
       error: (error, _) => AccessRestrictedScreen(
         status: ProfessionalAccessStatus.unknown,
@@ -27,6 +28,12 @@ class AuthGateScreen extends ConsumerWidget {
         },
       ),
       data: (decision) {
+        // A previous account's provider value must never render after an OTP
+        // changes the Supabase session, even during a refresh transition.
+        final userId = ref.read(authRepositoryProvider).currentUser?.id;
+        if (!decision.belongsTo(userId)) {
+          return const _AccessLoadingScreen();
+        }
         switch (decision.type) {
           case AppAccessType.unauthenticated:
             return const LoginScreen();
