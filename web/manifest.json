@@ -1,11 +1,11 @@
 {
-    "name": "fixis_pro",
-    "short_name": "fixis_pro",
+    "name": "FIXIS",
+    "short_name": "FIXIS",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#204DDB",
+    "theme_color": "#204DDB",
+    "description": "FIXIS: servicios confiables para tu hogar en Ecuador.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
