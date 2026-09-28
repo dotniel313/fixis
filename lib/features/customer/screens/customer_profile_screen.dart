@@ -12,6 +12,7 @@ import '../../auth/providers/auth_repository.dart';
 import '../../auth/screens/login_screen.dart';
 import '../../ratings/providers/ratings_repository.dart';
 import '../../ratings/screens/received_ratings_screen.dart';
+import '../models/customer_loyalty_progress.dart';
 import '../providers/customer_repository.dart';
 
 final customerLoyaltyProvider =
@@ -301,12 +302,7 @@ class _CustomerProfileScreenState
                       final paid = (data['paid_services'] as num?)?.toInt() ?? 0;
                       final categories =
                           (data['categories_used'] as num?)?.toInt() ?? 0;
-                      final level = paid >= 10
-                          ? 'Cliente habitual'
-                          : paid >= 3
-                              ? 'Cliente recurrente'
-                              : 'Primeros servicios';
-                      final nextGoal = paid >= 10 ? null : (paid >= 3 ? 10 : 3);
+                      final loyalty = CustomerLoyaltyProgress(paid);
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -320,12 +316,12 @@ class _CustomerProfileScreenState
                             ),
                           ),
                           const SizedBox(height: 10),
-                          Text('Reconocimiento: $level'),
-                          if (nextGoal != null) ...[
+                          Text('Reconocimiento: ${loyalty.level}'),
+                          if (loyalty.nextGoal != null) ...[
                             const SizedBox(height: 8),
-                            LinearProgressIndicator(value: paid / nextGoal),
+                            LinearProgressIndicator(value: loyalty.progress!),
                             const SizedBox(height: 4),
-                            Text('Te faltan ${nextGoal - paid} servicios pagados para el próximo reconocimiento.'),
+                            Text('Te faltan ${loyalty.remaining} servicios pagados para el próximo reconocimiento.'),
                           ],
                           const SizedBox(height: 10),
                           const Text(
