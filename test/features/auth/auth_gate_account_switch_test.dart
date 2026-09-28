@@ -11,6 +11,7 @@ void main() {
     final client = SupabaseClient(
       'https://example.supabase.co',
       'test-anon-key',
+      authOptions: const AuthClientOptions(autoRefreshToken: false),
     );
 
     await tester.pumpWidget(
@@ -34,7 +35,7 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(find.text('Pagos'), findsNothing);
 
-    await client.dispose();
+    addTearDown(client.dispose);
   });
 
   test('una decision de acceso solo pertenece a su usuario', () {
