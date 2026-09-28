@@ -34,7 +34,7 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(find.text('Pagos'), findsNothing);
 
-    client.dispose();
+    await client.dispose();
   });
 
   test('una decision de acceso solo pertenece a su usuario', () {
