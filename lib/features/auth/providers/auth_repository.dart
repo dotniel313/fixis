@@ -416,7 +416,10 @@ enum AppAccessType { unauthenticated, professional, customer, admin, restricted 
 class AppAccessDecision {
   final AppAccessType type;
   final Map<String, dynamic>? profile;
-  const AppAccessDecision(this.type, {this.profile});
+  final String? userId;
+  const AppAccessDecision(this.type, {this.profile, this.userId});
+
+  bool belongsTo(String? currentUserId) => userId == currentUserId;
 }
 
 final appAccessProvider = FutureProvider<AppAccessDecision>((ref) async {
@@ -429,7 +432,7 @@ final appAccessProvider = FutureProvider<AppAccessDecision>((ref) async {
   final profile = await repo.getAccessProfile(forceRefresh: true);
   if (profile == null) {
     debugPrint('[AUTH] access restricted: profile not found for ${user.id}');
-    return const AppAccessDecision(AppAccessType.restricted);
+    return AppAccessDecision(AppAccessType.restricted, userId: user.id);
   }
 
   final role = profile['role']?.toString();
@@ -442,20 +445,20 @@ final appAccessProvider = FutureProvider<AppAccessDecision>((ref) async {
   );
 
   if (account != 'active') {
-    return AppAccessDecision(AppAccessType.restricted, profile: profile);
+    return AppAccessDecision(AppAccessType.restricted, profile: profile, userId: user.id);
   }
 
   if (role == 'customer') {
-    return AppAccessDecision(AppAccessType.customer, profile: profile);
+    return AppAccessDecision(AppAccessType.customer, profile: profile, userId: user.id);
   }
 
   if (role == 'admin') {
-    return AppAccessDecision(AppAccessType.admin, profile: profile);
+    return AppAccessDecision(AppAccessType.admin, profile: profile, userId: user.id);
   }
 
   if (role == 'professional' && verification == 'approved') {
-    return AppAccessDecision(AppAccessType.professional, profile: profile);
+    return AppAccessDecision(AppAccessType.professional, profile: profile, userId: user.id);
   }
 
-  return AppAccessDecision(AppAccessType.restricted, profile: profile);
+  return AppAccessDecision(AppAccessType.restricted, profile: profile, userId: user.id);
 });
