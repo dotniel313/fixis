@@ -25,7 +25,7 @@ Ultima actualizacion: 2026-09-28
 | iOS Build | PASS | 2026-09-26: usuario actualizo la rama e instalo en iPhone 15 Pro; captura de la compilacion actual muestra el mensaje de pago corregido en el detalle de su servicio |
 | iOS Install/Launch Smoke | PASS | 2026-09-25: usuario confirma que build release abre con normalidad desde icono en iPhone 15 Pro sin depurador; informe del fallo al reabrir muestra build debug |
 | iOS Physical QA | PENDING | Acceso en tres iPhone, flujo hasta pago y arranque release sin depurador reportados; calificacion FIXI a cliente probada en iPhone; faltan fidelizacion y rutas adicionales por rol |
-| iOS Login OTP | PENDING | Acceso a las cuentas probado en tres iPhone; no consta evidencia separada de envio/reenvio OTP, codigo ni persistencia de sesion para todos los roles |
+| iOS Login OTP | PENDING | 2026-09-27: usuario confirma en iPhone 15 que un cliente de pruebas entra con codigo y conserva la sesion tras cerrar y reabrir la app. Falta reenvio y validacion separada de los otros roles |
 | iOS Admin despues de autorizacion de pago | PASS | Administrador verifico el pago por transferencia bancaria del cliente tras completar el flujo en tres telefonos; liquidacion al profesional aun no transferida |
 | Supabase Transactional Reset | PASS | docs/QA_TRANSACTIONAL_RESET_v1.10.8.7.md |
 | Backup Transactional | PASS | fixis_backup_reset_20260916 |
