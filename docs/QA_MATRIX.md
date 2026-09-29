@@ -13,9 +13,9 @@ Ultima actualizacion: 2026-09-28
 
 | Area | Estado | Evidencia |
 |---|---|---|
-| Flutter Analyze | PASS | CI 36498709482 aprobo flutter analyze en la rama actual. |
-| Flutter Test | PENDING | CI 36498709482 aprobo 7 pruebas: limites de fidelizacion, pertenencia de decision de acceso a la sesion y referencia obligatoria de liquidacion con transporte HTTP simulado. Faltan pruebas de integracion de autenticacion y finanzas contra backend de ensayo. |
-| Android Debug Build | PASS | CI 36498709482 genero iconos, analizo, ejecuto pruebas y compilo APK debug con configuracion simulada. El APK release firmado y su QA fisico se registran por separado. |
+| Flutter Analyze | PASS | CI 36509341949, reintento del job, aprobo flutter analyze en la rama actual. |
+| Flutter Test | PENDING | CI 36509341949, reintento del job, aprobo 9 pruebas: limites de fidelizacion, pertenencia de decision de acceso a la sesion, intencion OTP de ingreso/alta y referencia bancaria obligatoria con HTTP simulado. Faltan pruebas de integracion contra backend de ensayo. |
+| Android Debug Build | PASS | CI 36509341949, reintento del job, genero iconos, analizo, ejecuto 9 pruebas y compilo APK debug con configuracion simulada. El primer intento fallo por HTTP 504 al descargar Gradle; el reintento concluyo bien. APK release firmado y QA fisico registrados por separado. |
 | Icono FIXIS iOS y logo login | PASS | 2026-09-27: captura de Biblioteca de apps en iPhone muestra icono azul con llave blanca FIXIS instalado; captura anterior confirmo el mismo simbolo en login. Se verificaron assets iOS versionados, evitando que git pull restablezca el icono Flutter |
 | Icono FIXIS Android | PASS | 2026-09-27: captura de dispositivo Android confirma llave blanca sobre fondo azul en el launcher. El nombre visible FIXIS se ajusto despues de esta captura; comprobar al instalar la siguiente compilacion |
 | Favicon del sitio publico FIXIS | PASS | 2026-09-27: captura de Safari en fixis.geotactics.com.ec muestra favicon de llave blanca sobre fondo azul y titulo FIXIS |
@@ -53,8 +53,9 @@ Ultima actualizacion: 2026-09-28
 | Fidelizacion cliente | PASS | 2026-09-26: captura Android de Maria muestra 1 servicio pagado, 1 categoria y 2 servicios restantes para reconocimiento a 3; RPC aplicada, sin dinero, descuentos ni canjes | 
 | Reconocimientos a 3 y 10 pagos | PENDING | CI 36369387263 valida de forma aislada el cálculo de limites 3 y 10, sin crear pagos ficticios; falta comprobar RPC y UI con cuentas reales al alcanzar ambos umbrales |
 | Nivel FIXIS profesional | PASS | 2026-09-26: captura iPhone muestra rango Inicial, 2 servicios confirmados, progreso 2/5 y 3 para meta, coherentes con dos trabajos del profesional; beneficios futuros siguen sin reglas definidas |
-| Finance Regression | BLOCKED | Dos pagos de clientes conciliados: cada uno con una ganancia y una comision; corte semanal de 102,00 en processing, sin debito de liquidacion. Billetera profesional confirma ganancias reservadas y retirado cero. Migracion 032 y flujo administrativo iOS verificados: referencia requerida y notas opcionales. 2026-09-26: el usuario aclara que aun no hay cuenta bancaria operativa asociada durante las pruebas; no corresponde transferir ni marcar la liquidacion pagada. La verificacion financiera de pagos y reserva es PASS; el cierre real queda bloqueado hasta definir cuenta y operacion real. |
+| Finance Regression | PASS | Alcance financiero del piloto: cliente transfiere a la cuenta asignada y adjunta comprobante; administrador verifica la recepcion antes de confirmar el pago. Dos pagos de prueba quedaron paid y conciliados, con una ganancia y una comision por pago; corte semanal reservado en processing sin debito de salida. La transferencia posterior al FIXI se gestiona manualmente y permanece pendiente, sin marcarla pagada. Migracion 032 y prueba CI de referencia obligatoria protegen ese cierre posterior; no se ejecuto transferencia real al FIXI. |
 | Security Regression | PASS | RLS activo en ocho tablas y permisos RPC correctos; simulaciones SQL confirmadas: cliente ve su pago, no ve pagos ajenos ni liquidaciones; profesional ve sus ganancias y liquidacion, no la comision FIXIS; administrador ve pagos y liquidaciones. Aislamiento de identidad/calificaciones y migracion 035 validados. 2026-09-26: Jhony Torres en iPhone 15 Pro no ve servicios de Maria Jose, y capturas confirman su perfil, reseña 3/5, servicio propio y pago confirmado. Version actual instalada en iPhone 15 Pro; QA de compilacion Android sigue pendiente en fila Android Physical QA |
+| Preparacion operativa de cobros y transferencias | PENDING | Antes de cobrar dinero real, confirmar que la cuenta receptora activa se muestra al cliente y que administracion tiene un procedimiento para cotejar cada comprobante con el abono bancario. El desembolso posterior al FIXI exige transferencia efectiva y referencia antes de marcar la liquidacion pagada; la prueba con fondos reales se reserva para la operacion, sin inventar un debito en QA. |
 | Login / Signup Android actualizado | PASS | 2026-09-27: reenvio OTP tras 60 segundos e ingreso al perfil correcto confirmados. 2026-09-28: alta de cliente nuevo realizada con APK release en Redmi; OTP permite entrar a perfil propio. Intento con correo ya vinculado a otro rol no cambia el rol; usuario reviso tabla profiles en Supabase y confirma que no se creo perfil duplicado en el caso probado. Evidencia de inspeccion visual; no representa auditoria global de unicidad. |
 
 ## Criterios v1.10.8.6
@@ -75,7 +76,7 @@ Ultima actualizacion: 2026-09-28
 ## Regla de cierre
 
 La version no puede pasar a release mientras Revised Quote Flow,
-Finance Regression, Security Regression y QA fisico permanezcan en PENDING
-o BLOCKED. Calificacion bilateral y fidelizacion basada en actividad pagada estan
+Finance Regression, Security Regression, Preparacion operativa de cobros y
+transferencias o QA fisico permanezcan en PENDING o BLOCKED. Calificacion bilateral y fidelizacion basada en actividad pagada estan
 implementadas en la rama; migraciones 033/034 aplicadas y preflight aprobado; CI compilo APK debug, instalacion realizada y calificacion bilateral probada en iPhone/Android; otras rutas fisicas pendientes.
 No se habilitan descuentos, puntos monetarios ni canjes sin reglas comerciales.
