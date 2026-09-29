@@ -11,7 +11,6 @@ import '../../../core/widgets/fixis_map_tiles.dart';
 import '../../../core/widgets/fixis_ui.dart';
 import '../../auth/providers/auth_repository.dart';
 import '../../activity/screens/professional_activity_screen.dart';
-import '../../gamification/screens/gamification_screen.dart';
 import '../../jobs/providers/jobs_repository.dart';
 import '../../jobs/screens/job_detail_screen.dart';
 import '../../notifications/providers/notifications_repository.dart';
@@ -36,6 +35,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   List<Map<String, dynamic>> _nearbyJobs = const [];
   final MapController _radarMapController = MapController();
   bool _radarMapReady = false;
+  int _selectedTab = 0;
+  bool _activityVisited = false;
+  bool _walletVisited = false;
 
   static const String _keyLocationAccepted =
       'has_accepted_location_disclosure';
@@ -273,275 +275,227 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
-      body: SafeArea(
-        top: false,
-        minimum: const EdgeInsets.only(bottom: 12),
-        child: Column(
-          children: [
-            _buildHeader(),
-            Expanded(child: _buildBody()),
-          ],
-        ),
+      body: IndexedStack(
+        index: _selectedTab,
+        children: [
+          SafeArea(
+            top: false,
+            child: Column(
+              children: [
+                _buildHeader(),
+                Expanded(child: _buildBody()),
+              ],
+            ),
+          ),
+          _activityVisited
+              ? const ProfessionalActivityScreen()
+              : const SizedBox.shrink(),
+          _walletVisited ? const WalletScreen() : const SizedBox.shrink(),
+        ],
+      ),
+      bottomNavigationBar: NavigationBar(
+        height: 70,
+        backgroundColor: Colors.white,
+        indicatorColor: AppTheme.primaryBlue.withValues(alpha: 0.12),
+        selectedIndex: _selectedTab,
+        onDestinationSelected: (index) {
+          if (index == _selectedTab) return;
+          setState(() {
+            _selectedTab = index;
+            if (index == 1) _activityVisited = true;
+            if (index == 2) _walletVisited = true;
+          });
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.radar_outlined),
+            selectedIcon: Icon(Icons.radar_rounded),
+            label: 'Radar',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.insights_outlined),
+            selectedIcon: Icon(Icons.insights_rounded),
+            label: 'Actividad',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.account_balance_wallet_outlined),
+            selectedIcon: Icon(Icons.account_balance_wallet_rounded),
+            label: 'Billetera',
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildHeader() {
+    final profile = ref.watch(userProfileProvider).valueOrNull;
+    final firstName = profile?['full_name']?.toString().split(' ').first ?? 'Experto';
+    final category = profile?['category']?.toString() ?? 'Profesional';
+    final avatarUrl = profile?['avatar_url']?.toString();
+    final unread = ref.watch(unreadNotificationsCountProvider);
+
     return Container(
-      padding: const EdgeInsets.only(
-        top: 54,
-        left: 20,
-        right: 20,
-        bottom: 22,
+      padding: EdgeInsets.fromLTRB(
+        18,
+        MediaQuery.paddingOf(context).top + 10,
+        18,
+        14,
       ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            AppTheme.midnight,
-            AppTheme.midnightSoft,
-          ],
+          colors: [AppTheme.midnight, AppTheme.midnightSoft],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(AppTheme.radiusXl),
-          bottomRight: Radius.circular(AppTheme.radiusXl),
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(AppTheme.radiusLg),
         ),
-        boxShadow: AppTheme.floatingShadow,
       ),
       child: Column(
         children: [
-          const Row(
-            children: [
-              FixisBrandMark(compact: true),
-              Spacer(),
-              FixisStatusPill(
-                label: 'PROFESIONAL',
-                color: AppTheme.primaryOrange,
-                icon: Icons.verified_rounded,
-              ),
-            ],
-          ),
-          const SizedBox(height: 22),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Expanded(
-                child: Consumer(
-                  builder: (context, ref, _) {
-                    final profileAsync = ref.watch(userProfileProvider);
-                    return profileAsync.when(
-                      data: (profile) {
-                        final firstName =
-                            profile?['full_name']?.toString().split(' ').first ??
-                                'Experto';
-                        final category =
-                            profile?['category']?.toString() ?? 'Profesional';
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Buenas, $firstName',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: -0.6,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              category,
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.68),
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                      loading: () => const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
+              const FixisBrandMark(compact: true),
+              const Spacer(),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  FixisIconButton(
+                    icon: Icons.notifications_none_rounded,
+                    tooltip: 'Notificaciones',
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const NotificationsScreen(),
+                      ),
+                    ),
+                  ),
+                  if (unread > 0)
+                    Positioned(
+                      right: -3,
+                      top: -4,
+                      child: Container(
+                        constraints: const BoxConstraints(
+                          minWidth: 18,
+                          minHeight: 18,
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        decoration: BoxDecoration(
+                          color: AppTheme.danger,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppTheme.midnightSoft,
+                            width: 2,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          unread > 99 ? '99+' : '$unread',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                       ),
-                      error: (_, __) => const Text(
-                        'Buenas, Experto',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 24,
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                    ),
+                ],
               ),
               const SizedBox(width: 10),
-              FixisIconButton(
-                icon: Icons.account_balance_wallet_rounded,
-                tooltip: 'Billetera',
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const WalletScreen()),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Consumer(
-                builder: (context, ref, _) {
-                  final unread =
-                      ref.watch(unreadNotificationsCountProvider);
-
-                  return Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      FixisIconButton(
-                        icon: Icons.notifications_none_rounded,
-                        tooltip: 'Notificaciones',
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const NotificationsScreen(),
-                          ),
-                        ),
-                      ),
-                      if (unread > 0)
-                        Positioned(
-                          right: -3,
-                          top: -4,
-                          child: Container(
-                            constraints: const BoxConstraints(
-                              minWidth: 18,
-                              minHeight: 18,
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: AppTheme.danger,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: AppTheme.midnightSoft,
-                                width: 2,
-                              ),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              unread > 99 ? '99+' : '$unread',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 9,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  );
-                },
-              ),
-              const SizedBox(width: 8),
-              GestureDetector(
+              InkWell(
+                borderRadius: BorderRadius.circular(28),
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const ProfileScreen()),
                 ),
-                child: Consumer(
-                  builder: (context, ref, _) {
-                    final profile =
-                        ref.watch(userProfileProvider).valueOrNull;
-                    final avatarUrl = profile?['avatar_url']?.toString();
-                    return Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppTheme.primaryOrange,
-                          width: 2,
-                        ),
-                      ),
-                      child: CircleAvatar(
-                        backgroundColor:
-                            Colors.white.withValues(alpha: 0.12),
-                        radius: 19,
-                        backgroundImage:
-                            avatarUrl != null ? NetworkImage(avatarUrl) : null,
-                        child: avatarUrl == null
-                            ? const Icon(
-                                Icons.person_rounded,
-                                color: Colors.white,
-                                size: 19,
-                              )
-                            : null,
-                      ),
-                    );
-                  },
+                child: CircleAvatar(
+                  radius: 22,
+                  backgroundColor: AppTheme.primaryOrange,
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: AppTheme.midnightSoft,
+                    backgroundImage:
+                        avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                    child: avatarUrl == null
+                        ? const Icon(Icons.person_rounded, color: Colors.white)
+                        : null,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 18),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              border: Border.all(
-                color: _isOnline
-                    ? AppTheme.success.withValues(alpha: 0.45)
-                    : Colors.white.withValues(alpha: 0.12),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.radar,
-                  color: _isOnline ? AppTheme.success : Colors.white54,
-                  size: 28,
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Buenas, $firstName',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    Text(
+                      category,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _isOnline ? 'Estás en Línea' : 'Estás Desconectado',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: _isOnline
-                              ? Colors.white
-                              : Colors.white70,
-                        ),
-                      ),
-                      Text(
-                        _isOnline
-                            ? 'Recibiendo nuevas solicitudes'
-                            : 'Tus trabajos aceptados siguen disponibles abajo',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.62),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.only(left: 10, right: 2),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.09),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: _isOnline
+                        ? AppTheme.success.withValues(alpha: 0.45)
+                        : Colors.white24,
                   ),
                 ),
-                _isLoadingLocation
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Switch(
-                        value: _isOnline,
-                        activeTrackColor: Colors.green.withValues(alpha: 0.5),
-                        activeThumbColor: Colors.green,
-                        onChanged: _toggleOnlineStatus,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _isOnline ? 'En línea' : 'Desconectado',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
                       ),
-              ],
-            ),
+                    ),
+                    _isLoadingLocation
+                        ? const Padding(
+                            padding: EdgeInsets.all(10),
+                            child: SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          )
+                        : Switch(
+                            value: _isOnline,
+                            activeTrackColor:
+                                AppTheme.success.withValues(alpha: 0.55),
+                            activeThumbColor: AppTheme.success,
+                            onChanged: _toggleOnlineStatus,
+                          ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -550,67 +504,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   Widget _buildBody() {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 18, 16, 32),
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
       children: [
         _buildMapFirstRadar(),
-        const SizedBox(height: 22),
+        const SizedBox(height: 18),
         _buildMyActiveJobs(),
-        const SizedBox(height: 16),
-        _buildPremiumQuickActions(),
-        const SizedBox(height: 22),
         FixisSectionHeader(
           title: 'Nuevas oportunidades',
           subtitle: _isOnline
               ? 'Solicitudes compatibles dentro de tu radio'
-              : 'Activa el radar para descubrir servicios cercanos',
-          trailing: FixisStatusPill(
-            label: _isOnline ? 'RADAR ACTIVO' : 'OFFLINE',
-            color: _isOnline ? AppTheme.success : AppTheme.slate500,
-            icon: _isOnline ? Icons.radar_rounded : Icons.location_off_rounded,
-          ),
+              : 'Activa el radar para buscar servicios cercanos',
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         if (_isOnline) _buildRealtimeJobsArea() else _buildOfflineRadar(),
       ],
     );
   }
-
-  Widget _buildPremiumQuickActions() {
-    return Row(
-      children: [
-        Expanded(
-          child: _QuickActionCard(
-            icon: Icons.workspace_premium_rounded,
-            label: 'Nivel FIXIS',
-            caption: 'Progreso y logros',
-            color: AppTheme.warning,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const GamificationScreen(),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _QuickActionCard(
-            icon: Icons.insights_rounded,
-            label: 'Mi actividad',
-            caption: 'Servicios y rendimiento',
-            color: AppTheme.primaryBlue,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const ProfessionalActivityScreen(),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
 
   Widget _buildMapFirstRadar() {
     final position = _currentPosition;
@@ -619,38 +528,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       padding: EdgeInsets.zero,
       radius: AppTheme.radiusLg,
       border: Border.all(color: AppTheme.slate200),
-      shadows: AppTheme.softShadow,
+      shadows: const [],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 16, 14, 12),
-            child: Row(
-              children: [
-                const Expanded(
-                  child: FixisSectionHeader(
-                    title: 'Radar FIXIS',
-                    subtitle: 'Tu zona de servicio en tiempo real',
-                  ),
-                ),
-                FixisStatusPill(
-                  label: _isOnline ? 'EN LÍNEA' : 'OFFLINE',
-                  color: _isOnline ? AppTheme.success : AppTheme.slate500,
-                  icon: _isOnline
-                      ? Icons.location_on_rounded
-                      : Icons.location_off_rounded,
-                ),
-              ],
-            ),
-          ),
           ClipRRect(
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(AppTheme.radiusLg),
-              bottomRight: Radius.circular(AppTheme.radiusLg),
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(AppTheme.radiusLg),
             ),
-              child: SizedBox(
-              height: (MediaQuery.sizeOf(context).height * 0.47)
-                  .clamp(340.0, 520.0)
+            child: SizedBox(
+              height: (MediaQuery.sizeOf(context).height * 0.52)
+                  .clamp(330.0, 500.0)
                   .toDouble(),
               child: position == null
                   ? _buildMapPlaceholder()
@@ -740,7 +628,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 15),
+            padding: const EdgeInsets.fromLTRB(14, 4, 12, 4),
             child: Row(
               children: [
                 Expanded(
@@ -1076,11 +964,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     if (_isLoadingNearbyJobs) return _buildRadarLoading();
 
     if (_nearbyJobs.isEmpty) {
-      return _InfoCard(
-        icon: Icons.radar_rounded,
-        title: 'Sin oportunidades dentro de ${_serviceRadiusKm.toInt()} km',
-        message:
-            'El radar solo muestra solicitudes con tu categoría y ubicación dentro de tu radio de servicio.',
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+        child: Text(
+          'Sin solicitudes compatibles en ${_serviceRadiusKm.toInt()} km. '
+          'Te avisaremos cuando aparezcan.',
+          style: const TextStyle(color: AppTheme.slate500, fontSize: 13),
+        ),
       );
     }
 
@@ -1305,83 +1195,6 @@ class _RadarGridPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _QuickActionCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String caption;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _QuickActionCard({
-    required this.icon,
-    required this.label,
-    required this.caption,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            border: Border.all(color: AppTheme.slate200),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(13),
-                ),
-                child: Icon(icon, color: color, size: 20),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppTheme.darkSlate,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      caption,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppTheme.slate500,
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class _InfoCard extends StatelessWidget {
