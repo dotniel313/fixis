@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/fixis_ui.dart';
+import '../../gamification/screens/gamification_screen.dart';
 import '../../jobs/providers/jobs_repository.dart';
 import '../../jobs/screens/job_detail_screen.dart';
 
@@ -108,7 +109,24 @@ class ProfessionalActivityScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const GamificationScreen(),
+                  ),
+                ),
+                icon: const Icon(
+                  Icons.workspace_premium_rounded,
+                  color: AppTheme.primaryOrange,
+                ),
+                label: const Text('Ver mi Nivel FIXIS'),
+              ),
+            ),
+            const SizedBox(height: 12),
             activeAsync.when(
               loading: () => const Center(
                 child: Padding(
