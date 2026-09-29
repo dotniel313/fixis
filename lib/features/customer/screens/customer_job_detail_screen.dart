@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../core/services/route_service.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/fixis_map_tiles.dart';
 import '../../../core/widgets/fixis_ui.dart';
 import '../../ratings/screens/job_rating_screen.dart';
 import '../providers/customer_repository.dart';
@@ -18,7 +19,8 @@ class CustomerJobDetailScreen extends ConsumerStatefulWidget {
   ConsumerState<CustomerJobDetailScreen> createState() => _CustomerJobDetailScreenState();
 }
 
-class _CustomerJobDetailScreenState extends ConsumerState<CustomerJobDetailScreen> {
+class _CustomerJobDetailScreenState extends ConsumerState<CustomerJobDetailScreen>
+    with SingleTickerProviderStateMixin {
   bool _loadingAction = false;
 
   final RouteService _routeService = OsrmRouteService();
@@ -28,6 +30,91 @@ class _CustomerJobDetailScreenState extends ConsumerState<CustomerJobDetailScree
   DateTime? _routeRequestedAt;
   bool _routeLoading = false;
   String? _routeError;
+  final MapController _liveMapController = MapController();
+  late final AnimationController _cameraAnimation;
+  bool _liveMapReady = false;
+  bool _followFixi = true;
+  LatLng? _cameraTarget;
+  LatLng? _latestCenter;
+  double? _latestZoom;
+  LatLng? _cameraStart;
+  double _zoomStart = 14;
+  LatLng? _markerStart;
+  LatLng? _markerTarget;
+
+  @override
+  void initState() {
+    super.initState();
+    _cameraAnimation = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 750),
+    )..addListener(() {
+        if (!_liveMapReady || _cameraStart == null || _cameraTarget == null) {
+          return;
+        }
+        final t = Curves.easeInOutCubic.transform(_cameraAnimation.value);
+        _liveMapController.move(
+          LatLng(
+            _cameraStart!.latitude +
+                (_cameraTarget!.latitude - _cameraStart!.latitude) * t,
+            _cameraStart!.longitude +
+                (_cameraTarget!.longitude - _cameraStart!.longitude) * t,
+          ),
+          _zoomStart + ((_latestZoom ?? _zoomStart) - _zoomStart) * t,
+        );
+      });
+  }
+
+  @override
+  void dispose() {
+    _cameraAnimation.dispose();
+    _liveMapController.dispose();
+    super.dispose();
+  }
+
+  LatLng _animatedMarker(LatLng fallback) {
+    if (_markerStart == null || _markerTarget == null) {
+      return _markerTarget ?? fallback;
+    }
+    final t = Curves.easeInOutCubic.transform(_cameraAnimation.value);
+    return LatLng(
+      _markerStart!.latitude +
+          (_markerTarget!.latitude - _markerStart!.latitude) * t,
+      _markerStart!.longitude +
+          (_markerTarget!.longitude - _markerStart!.longitude) * t,
+    );
+  }
+
+  void _followRoute(LatLng center, double zoom, LatLng professionalPoint) {
+    _latestCenter = center;
+    _latestZoom = zoom;
+    if (_markerTarget == null) {
+      _markerTarget = professionalPoint;
+      return;
+    }
+    if (const Distance().as(
+          LengthUnit.Meter,
+          _markerTarget!,
+          professionalPoint,
+        ) < 8) {
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_liveMapReady) return;
+      final previousMarker = _animatedMarker(professionalPoint);
+      _cameraAnimation.stop();
+      _markerStart = previousMarker;
+      _markerTarget = professionalPoint;
+      if (_followFixi) {
+        _cameraStart = _liveMapController.camera.center;
+        _zoomStart = _liveMapController.camera.zoom;
+        _cameraTarget = center;
+      } else {
+        _cameraStart = null;
+      }
+      _cameraAnimation.forward(from: 0);
+    });
+  }
 
   Future<void> _refresh() async => setState(() {});
 
@@ -359,6 +446,7 @@ class _CustomerJobDetailScreenState extends ConsumerState<CustomerJobDetailScree
         if (!arrived && servicePoint != null) {
           _scheduleRouteRefresh(professionalPoint, servicePoint);
         }
+        if (!arrived) _followRoute(center, zoom, professionalPoint);
 
         return FixisSurface(
           padding: EdgeInsets.zero,
@@ -373,25 +461,32 @@ class _CustomerJobDetailScreenState extends ConsumerState<CustomerJobDetailScree
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                height: 290,
-                child: FlutterMap(
-                  key: ValueKey(
-                    'fixis-live-${professionalPoint.latitude.toStringAsFixed(5)}-${professionalPoint.longitude.toStringAsFixed(5)}',
-                  ),
+                height: (MediaQuery.sizeOf(context).height * 0.48)
+                    .clamp(340.0, 540.0)
+                    .toDouble(),
+                child: Stack(
+                  children: [
+                  FlutterMap(
+                  mapController: _liveMapController,
                   options: MapOptions(
                     initialCenter: center,
                     initialZoom: zoom,
                     minZoom: 4,
                     maxZoom: 18,
+                    backgroundColor: fixisMapCanvas(),
+                    onMapReady: () => _liveMapReady = true,
+                    onPositionChanged: (_, hasGesture) {
+                      if (hasGesture && _followFixi) {
+                        _cameraAnimation.stop();
+                        setState(() => _followFixi = false);
+                      }
+                    },
                     interactionOptions: const InteractionOptions(
                       flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
                     ),
                   ),
                   children: [
-                    TileLayer(
-                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'fixis_pro',
-                    ),
+                    const FixisMapTiles(),
                     if (!arrived && _route != null && _route!.points.length >= 2)
                       PolylineLayer(
                         polylines: [
@@ -404,10 +499,12 @@ class _CustomerJobDetailScreenState extends ConsumerState<CustomerJobDetailScree
                           ),
                         ],
                       ),
-                    MarkerLayer(
+                    AnimatedBuilder(
+                      animation: _cameraAnimation,
+                      builder: (context, _) => MarkerLayer(
                       markers: [
                         Marker(
-                          point: professionalPoint,
+                          point: _animatedMarker(professionalPoint),
                           width: 72,
                           height: 86,
                           child: _fixisPulseMarker(
@@ -423,6 +520,25 @@ class _CustomerJobDetailScreenState extends ConsumerState<CustomerJobDetailScree
                             child: _serviceDestinationMarker(),
                           ),
                       ],
+                    ),
+                    ),
+                  ],
+                ),
+                  if (!arrived && !_followFixi)
+                    Positioned(
+                      top: 14,
+                      right: 14,
+                      child: FilledButton.icon(
+                        onPressed: () {
+                          setState(() => _followFixi = true);
+                          _liveMapController.move(
+                            _latestCenter ?? center,
+                            _latestZoom ?? zoom,
+                          );
+                        },
+                        icon: const Icon(Icons.my_location_rounded, size: 18),
+                        label: const Text('Seguir FIXI'),
+                      ),
                     ),
                   ],
                 ),
