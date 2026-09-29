@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/theme.dart';
 import '../providers/auth_repository.dart';
 import 'customer_signup_screen.dart';
+import 'password_login_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -331,6 +332,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 )
               ],
               if (!_codeSent) ...[
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: (_isLoading || _otpRequestInFlight)
+                      ? null
+                      : () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const PasswordLoginScreen(),
+                            ),
+                          );
+                        },
+                  child: const Text('Ingresar con contraseña'),
+                ),
                 const SizedBox(height: 18),
                 const Divider(),
                 const SizedBox(height: 8),
