@@ -310,7 +310,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         bottomNavigationBar: NavigationBar(
           height: 70,
           backgroundColor: Colors.white,
-          indicatorColor: AppTheme.primaryBlue.withValues(alpha: 0.12),
+          indicatorColor: AppTheme.orangeSoft,
           selectedIndex: _selectedTab,
           onDestinationSelected: (index) {
             if (index == _selectedTab) return;
@@ -324,13 +324,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             NavigationDestination(
               icon: Icon(Icons.radar_outlined, color: AppTheme.darkSlate),
               selectedIcon:
-                  Icon(Icons.radar_rounded, color: AppTheme.primaryBlue),
+                  Icon(Icons.radar_rounded, color: AppTheme.orangeStrong),
               label: 'Radar',
             ),
             NavigationDestination(
               icon: Icon(Icons.insights_outlined, color: AppTheme.darkSlate),
               selectedIcon:
-                  Icon(Icons.insights_rounded, color: AppTheme.primaryBlue),
+                  Icon(Icons.insights_rounded, color: AppTheme.orangeStrong),
               label: 'Actividad',
             ),
             NavigationDestination(
@@ -340,7 +340,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
               selectedIcon: Icon(
                 Icons.account_balance_wallet_rounded,
-                color: AppTheme.primaryBlue,
+                color: AppTheme.orangeStrong,
               ),
               label: 'Billetera',
             ),
