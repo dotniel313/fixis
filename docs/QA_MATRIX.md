@@ -78,6 +78,7 @@ Ultima actualizacion: 2026-09-28
 
 La version no puede pasar a release mientras Revised Quote Flow,
 Finance Regression, Security Regression, Preparacion operativa de cobros y
-transferencias o QA fisico permanezcan en PENDING o BLOCKED. Calificacion bilateral y fidelizacion basada en actividad pagada estan
+transferencias, Google Play API 36 y compatibilidad 16 KB o QA fisico
+permanezcan en PENDING o BLOCKED. Calificacion bilateral y fidelizacion basada en actividad pagada estan
 implementadas en la rama; migraciones 033/034 aplicadas y preflight aprobado; CI compilo APK debug, instalacion realizada y calificacion bilateral probada en iPhone/Android; otras rutas fisicas pendientes.
 No se habilitan descuentos, puntos monetarios ni canjes sin reglas comerciales.
