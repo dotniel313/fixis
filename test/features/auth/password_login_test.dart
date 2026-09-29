@@ -33,7 +33,10 @@ void main() {
           'msg': 'Invalid login credentials',
         }),
         400,
-        headers: {'content-type': 'application/json'},
+        headers: {
+          'content-type': 'application/json',
+          'x-supabase-api-version': '2024-01-01',
+        },
       );
     });
 
@@ -66,7 +69,10 @@ void main() {
             'msg': 'Internal sensitive detail',
           }),
           429,
-          headers: {'content-type': 'application/json'},
+          headers: {
+          'content-type': 'application/json',
+          'x-supabase-api-version': '2024-01-01',
+        },
         ));
 
     await expectLater(
@@ -89,7 +95,7 @@ void main() {
       throwsA(isA<AuthFlowException>().having(
         (error) => error.message,
         'message',
-        'No fue posible conectarse. Revisa tu conexión e inténtalo nuevamente.',
+        'No fue posible iniciar sesión. Inténtalo nuevamente.',
       )),
     );
   });
