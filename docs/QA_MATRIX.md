@@ -21,7 +21,8 @@ Ultima actualizacion: 2026-09-28
 | Favicon del sitio publico FIXIS | PASS | 2026-09-27: captura de Safari en fixis.geotactics.com.ec muestra favicon de llave blanca sobre fondo azul y titulo FIXIS |
 | Identidad de Flutter web | PENDING | favicon e iconos PNG versionados; titulo, nombre de instalacion y descripcion corregidos a FIXIS en web/index.html y web/manifest.json. Falta compilar y comprobar esta app web por separado del sitio publico |
 | Android Release Bundle | PASS | 2026-09-28: usuario genero clave de subida JKS privada y compilo en su Mac app-release.aab firmado (49,1 MB); SHA-256 0d448b1cb4a9700997d2cf6ffc5c6f28b98964999bbac43d48878ff917357d3c. Firma AAB verificada independientemente con jarsigner (`jar verified`); avisos de certificado autofirmado/cadena no confiable y falta de sello de tiempo documentados. Pendiente registro en Play Console y distribucion; no equivale a QA fisico ni financiero aprobado |
-| Google Play API 36 y compatibilidad 16 KB | PENDING | Requisito vigente desde 2026-08-31: target SDK 36 para nueva app o actualizacion movil. La rama usa AGP 8.9.1 y Flutter 3.35.3 en CI (su valor predeterminado targetSdk es 36). Falta inspeccionar el APK/AAB release firmado del Mac: target SDK efectivo y compatibilidad de bibliotecas nativas con paginas de 16 KB antes de cargar en Play Console. |
+| Google Play target SDK 36 | PASS | 2026-09-28: usuario inspecciono el APK release firmado en su Mac con apkanalyzer y obtuvo target SDK 36. El proyecto usa AGP 8.9.1; API y compatibilidad nativa de 16 KB se validan por separado. |
+| Google Play compatibilidad 16 KB | PENDING | El APK/AAB incluye bibliotecas nativas por Flutter y dependencias; falta comprobar alineacion ZIP y ELF de las bibliotecas del artefacto release antes de cargarlo en Play Console. |
 | Cambio de cuenta admin a cliente en Android release | PASS | 2026-09-28: tras corregir AuthGate y actualizar APK release firmado en Redmi, usuario confirma acceso rapido y directo al perfil de Jhony Torres, sin paso visible por panel admin. CI 36486339815 aprobo analisis, pruebas y APK debug; otros cambios de rol quedan para QA complementaria |
 | Cambio de cuenta cliente a profesional en Android release | PASS | 2026-09-28: tras verificar OTP en Redmi Note 12, usuario confirma acceso rapido al rol profesional con su propio progreso; no observo datos ni pantalla de la cuenta cliente previa. |
 | Alta de cliente nuevo en Android release | PASS | 2026-09-28: el usuario confirma que la cuenta de cliente de prueba se creo desde el mismo Redmi y APK release, permitio ingreso y muestra solo su perfil sin historial previo. |
@@ -78,7 +79,7 @@ Ultima actualizacion: 2026-09-28
 
 La version no puede pasar a release mientras Revised Quote Flow,
 Finance Regression, Security Regression, Preparacion operativa de cobros y
-transferencias, Google Play API 36 y compatibilidad 16 KB o QA fisico
+transferencias, Google Play target SDK 36, Google Play compatibilidad 16 KB o QA fisico
 permanezcan en PENDING o BLOCKED. Calificacion bilateral y fidelizacion basada en actividad pagada estan
 implementadas en la rama; migraciones 033/034 aplicadas y preflight aprobado; CI compilo APK debug, instalacion realizada y calificacion bilateral probada en iPhone/Android; otras rutas fisicas pendientes.
 No se habilitan descuentos, puntos monetarios ni canjes sin reglas comerciales.
