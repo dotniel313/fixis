@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/theme/theme.dart';
+import '../../../core/widgets/fixis_map_tiles.dart';
 import '../../../core/widgets/fixis_ui.dart';
 import '../../auth/providers/auth_repository.dart';
 import '../../activity/screens/professional_activity_screen.dart';
@@ -33,9 +34,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Position? _currentPosition;
   double _serviceRadiusKm = 8;
   List<Map<String, dynamic>> _nearbyJobs = const [];
+  final MapController _radarMapController = MapController();
+  bool _radarMapReady = false;
 
   static const String _keyLocationAccepted =
       'has_accepted_location_disclosure';
+
+  @override
+  void dispose() {
+    _radarMapController.dispose();
+    super.dispose();
+  }
 
   Future<bool> _showLegalLocationDisclosureIfNeeded() async {
     final prefs = await SharedPreferences.getInstance();
@@ -108,6 +117,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         _currentPosition = null;
         _nearbyJobs = const [];
       });
+      _radarMapReady = false;
       return;
     }
 
@@ -199,6 +209,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   Future<void> _changeRadius(double radius) async {
     setState(() => _serviceRadiusKm = radius);
+    if (_radarMapReady && _currentPosition != null) {
+      _radarMapController.move(
+        LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+        _zoomForRadius(radius),
+      );
+    }
     if (!_isOnline || _currentPosition == null) return;
 
     try {
@@ -527,42 +543,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ],
             ),
           ),
-          if (_isOnline) ...[
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                const Icon(
-                  Icons.tune_rounded,
-                  size: 18,
-                  color: AppTheme.primaryOrange,
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  'Radio',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: [5.0, 8.0, 15.0, 25.0]
-                        .map(
-                          (radius) => ChoiceChip(
-                            label: Text('${radius.toInt()} km'),
-                            selected: _serviceRadiusKm == radius,
-                            onSelected: (_) => _changeRadius(radius),
-                          ),
-                        )
-                        .toList(growable: false),
-                  ),
-                ),
-              ],
-            ),
-          ],
         ],
       ),
     );
@@ -572,11 +552,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 32),
       children: [
-        _buildPremiumQuickActions(),
-        const SizedBox(height: 22),
         _buildMapFirstRadar(),
         const SizedBox(height: 22),
         _buildMyActiveJobs(),
+        const SizedBox(height: 16),
+        _buildPremiumQuickActions(),
         const SizedBox(height: 22),
         FixisSectionHeader(
           title: 'Nuevas oportunidades',
@@ -668,14 +648,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               bottomLeft: Radius.circular(AppTheme.radiusLg),
               bottomRight: Radius.circular(AppTheme.radiusLg),
             ),
-            child: SizedBox(
-              height: 260,
+              child: SizedBox(
+              height: (MediaQuery.sizeOf(context).height * 0.47)
+                  .clamp(340.0, 520.0)
+                  .toDouble(),
               child: position == null
                   ? _buildMapPlaceholder()
-                  : FlutterMap(
-                      key: ValueKey(
-                        'professional-radar-${position.latitude.toStringAsFixed(5)}-${position.longitude.toStringAsFixed(5)}-${_serviceRadiusKm.toInt()}',
-                      ),
+                  : Stack(
+                      children: [
+                        FlutterMap(
+                      mapController: _radarMapController,
                       options: MapOptions(
                         initialCenter: LatLng(
                           position.latitude,
@@ -684,16 +666,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         initialZoom: _zoomForRadius(_serviceRadiusKm),
                         minZoom: 4,
                         maxZoom: 18,
+                        backgroundColor: fixisMapCanvas(),
+                        onMapReady: () => _radarMapReady = true,
                         interactionOptions: const InteractionOptions(
                           flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
                         ),
                       ),
                       children: [
-                        TileLayer(
-                          urlTemplate:
-                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName: 'fixis_pro',
-                        ),
+                        const FixisMapTiles(),
                         CircleLayer(
                           circles: [
                             CircleMarker(
@@ -737,6 +717,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         ),
                       ],
                     ),
+                        Positioned(
+                          right: 14,
+                          top: 14,
+                          child: Material(
+                            color: Colors.white,
+                            elevation: 3,
+                            shape: const CircleBorder(),
+                            child: IconButton(
+                              tooltip: 'Centrar mi zona',
+                              icon: const Icon(Icons.my_location_rounded),
+                              color: AppTheme.primaryBlue,
+                              onPressed: () => _radarMapController.move(
+                                LatLng(position.latitude, position.longitude),
+                                _zoomForRadius(_serviceRadiusKm),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
             ),
           ),
           Padding(
@@ -756,11 +756,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                 ),
                 if (_isOnline)
-                  TextButton.icon(
-                    onPressed:
-                        _isLoadingNearbyJobs ? null : _loadNearbyJobs,
-                    icon: const Icon(Icons.refresh_rounded, size: 18),
-                    label: const Text('Actualizar'),
+                  PopupMenuButton<double>(
+                    tooltip: 'Cambiar radio de servicio',
+                    onSelected: _changeRadius,
+                    itemBuilder: (_) => [5.0, 8.0, 15.0, 25.0]
+                        .map((radius) => PopupMenuItem<double>(
+                              value: radius,
+                              child: Text('Radio ${radius.toInt()} km'),
+                            ))
+                        .toList(),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      child: Icon(Icons.tune_rounded,
+                          color: AppTheme.primaryBlue),
+                    ),
+                  ),
+                if (_isOnline)
+                  IconButton(
+                    tooltip: 'Actualizar oportunidades',
+                    onPressed: _isLoadingNearbyJobs ? null : _loadNearbyJobs,
+                    icon: const Icon(Icons.refresh_rounded,
+                        color: AppTheme.primaryBlue),
                   ),
               ],
             ),
@@ -846,27 +862,36 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
     if (lat == null || lng == null) return null;
 
+    final category = job['category']?.toString().toLowerCase() ?? '';
+    final categoryIcon = category.contains('electric')
+        ? Icons.bolt_rounded
+        : category.contains('plomer') || category.contains('gasfit')
+            ? Icons.water_drop_rounded
+            : category.contains('cerraj')
+                ? Icons.key_rounded
+                : Icons.handyman_rounded;
+
     return Marker(
       point: LatLng(lat, lng),
-      width: 54,
-      height: 64,
+      width: 48,
+      height: 48,
       child: GestureDetector(
         onTap: () => _showMapOpportunity(job),
         child: Container(
           alignment: Alignment.topCenter,
           child: Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: AppTheme.primaryOrange,
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+              color: AppTheme.primaryBlue,
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 3),
+              border: Border.all(color: Colors.white, width: 2),
               boxShadow: AppTheme.softShadow,
             ),
-            child: const Icon(
-              Icons.home_repair_service_rounded,
+            child: Icon(
+              categoryIcon,
               color: Colors.white,
-              size: 21,
+              size: 17,
             ),
           ),
         ),
