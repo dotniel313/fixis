@@ -66,6 +66,42 @@ class AuthRepository {
 
   String normalizeEmail(String email) => email.trim().toLowerCase();
 
+  /// Standard Supabase password authentication for existing accounts.
+  /// The Auth Gate remains responsible for role and account restrictions.
+  Future<AuthResponse> signInWithPassword(String email, String password) async {
+    clearAccessCache();
+    try {
+      final response = await _supabase.auth.signInWithPassword(
+        email: normalizeEmail(email),
+        // Password whitespace is significant.
+        password: password,
+      );
+      if (response.session == null || response.user == null) {
+        throw const AuthFlowException(
+          'No fue posible iniciar sesión. Inténtalo nuevamente.',
+        );
+      }
+      return response;
+    } on AuthException catch (e) {
+      final code = e.code;
+      final message = code == 'invalid_credentials'
+          ? 'El correo o la contraseña no son correctos.'
+          : code == 'email_not_confirmed'
+              ? 'Este correo todavía no está confirmado.'
+              : code == 'over_request_rate_limit' || e.statusCode == '429'
+                  ? 'Has realizado varios intentos. Espera antes de volver a ingresar.'
+                  : 'No fue posible iniciar sesión. Inténtalo nuevamente.';
+      // Do not log passwords or authentication response bodies.
+      throw AuthFlowException(message, code: code);
+    } on AuthFlowException {
+      rethrow;
+    } catch (_) {
+      throw const AuthFlowException(
+        'No fue posible conectarse. Revisa tu conexión e inténtalo nuevamente.',
+      );
+    }
+  }
+
   Future<void> sendOtp(String email) async {
     final normalizedEmail = normalizeEmail(email);
     final stopwatch = Stopwatch()..start();
