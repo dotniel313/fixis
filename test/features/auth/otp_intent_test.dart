@@ -12,6 +12,7 @@ void main() {
     final client = SupabaseClient(
       'https://example.supabase.co',
       'test-key',
+      authOptions: const AuthClientOptions(authFlowType: AuthFlowType.implicit),
       httpClient: MockClient((request) async {
         captured = request;
         return http.Response(
@@ -38,6 +39,7 @@ void main() {
     final client = SupabaseClient(
       'https://example.supabase.co',
       'test-key',
+      authOptions: const AuthClientOptions(authFlowType: AuthFlowType.implicit),
       httpClient: MockClient((request) async {
         captured = request;
         return http.Response(
