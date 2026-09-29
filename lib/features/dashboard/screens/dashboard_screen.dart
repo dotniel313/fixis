@@ -1,5 +1,6 @@
 // FIXIS PRO v1.10.1 - Map-first professional home.
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -273,56 +274,78 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
-      body: IndexedStack(
-        index: _selectedTab,
-        children: [
-          SafeArea(
-            top: false,
-            child: Column(
-              children: [
-                _buildHeader(),
-                Expanded(child: _buildBody()),
-              ],
+    const radarOverlay = SystemUiOverlayStyle(
+      statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
+      statusBarColor: Colors.transparent,
+    );
+    const otherOverlay = SystemUiOverlayStyle(
+      statusBarBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarColor: Colors.transparent,
+    );
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: _selectedTab == 0 ? radarOverlay : otherOverlay,
+      child: Scaffold(
+        backgroundColor: AppTheme.backgroundLight,
+        body: IndexedStack(
+          index: _selectedTab,
+          children: [
+            SafeArea(
+              top: false,
+              child: Column(
+                children: [
+                  _buildHeader(),
+                  Expanded(child: _buildBody()),
+                ],
+              ),
             ),
-          ),
-          _activityVisited
-              ? const ProfessionalActivityScreen()
-              : const SizedBox.shrink(),
-          _walletVisited ? const WalletScreen() : const SizedBox.shrink(),
-        ],
-      ),
-      bottomNavigationBar: NavigationBar(
-        height: 70,
-        backgroundColor: Colors.white,
-        indicatorColor: AppTheme.primaryBlue.withValues(alpha: 0.12),
-        selectedIndex: _selectedTab,
-        onDestinationSelected: (index) {
-          if (index == _selectedTab) return;
-          setState(() {
-            _selectedTab = index;
-            if (index == 1) _activityVisited = true;
-            if (index == 2) _walletVisited = true;
-          });
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.radar_outlined),
-            selectedIcon: Icon(Icons.radar_rounded),
-            label: 'Radar',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.insights_outlined),
-            selectedIcon: Icon(Icons.insights_rounded),
-            label: 'Actividad',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            selectedIcon: Icon(Icons.account_balance_wallet_rounded),
-            label: 'Billetera',
-          ),
-        ],
+            _activityVisited
+                ? const ProfessionalActivityScreen()
+                : const SizedBox.shrink(),
+            _walletVisited ? const WalletScreen() : const SizedBox.shrink(),
+          ],
+        ),
+        bottomNavigationBar: NavigationBar(
+          height: 70,
+          backgroundColor: Colors.white,
+          indicatorColor: AppTheme.primaryBlue.withValues(alpha: 0.12),
+          selectedIndex: _selectedTab,
+          onDestinationSelected: (index) {
+            if (index == _selectedTab) return;
+            setState(() {
+              _selectedTab = index;
+              if (index == 1) _activityVisited = true;
+              if (index == 2) _walletVisited = true;
+            });
+          },
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.radar_outlined, color: AppTheme.darkSlate),
+              selectedIcon:
+                  Icon(Icons.radar_rounded, color: AppTheme.primaryBlue),
+              label: 'Radar',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.insights_outlined, color: AppTheme.darkSlate),
+              selectedIcon:
+                  Icon(Icons.insights_rounded, color: AppTheme.primaryBlue),
+              label: 'Actividad',
+            ),
+            NavigationDestination(
+              icon: Icon(
+                Icons.account_balance_wallet_outlined,
+                color: AppTheme.darkSlate,
+              ),
+              selectedIcon: Icon(
+                Icons.account_balance_wallet_rounded,
+                color: AppTheme.primaryBlue,
+              ),
+              label: 'Billetera',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -509,14 +532,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         _buildMapFirstRadar(),
         const SizedBox(height: 18),
         _buildMyActiveJobs(),
-        FixisSectionHeader(
-          title: 'Nuevas oportunidades',
-          subtitle: _isOnline
-              ? 'Solicitudes compatibles dentro de tu radio'
-              : 'Activa el radar para buscar servicios cercanos',
-        ),
-        const SizedBox(height: 10),
-        if (_isOnline) _buildRealtimeJobsArea() else _buildOfflineRadar(),
+        if (_isOnline) ...[
+          const FixisSectionHeader(
+            title: 'Nuevas oportunidades',
+            subtitle: 'Solicitudes compatibles dentro de tu radio',
+          ),
+          const SizedBox(height: 10),
+          _buildRealtimeJobsArea(),
+        ],
       ],
     );
   }
@@ -533,9 +556,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(AppTheme.radiusLg),
-            ),
+            borderRadius: position == null
+                ? BorderRadius.circular(AppTheme.radiusLg)
+                : const BorderRadius.vertical(
+                    top: Radius.circular(AppTheme.radiusLg),
+                  ),
             child: SizedBox(
               height: (MediaQuery.sizeOf(context).height * 0.52)
                   .clamp(330.0, 500.0)
@@ -627,15 +652,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     ),
             ),
           ),
-          Padding(
+          if (position != null)
+            Padding(
             padding: const EdgeInsets.fromLTRB(14, 4, 12, 4),
             child: Row(
               children: [
                 Expanded(
                   child: Text(
-                    position == null
-                        ? 'Activa el radar para visualizar tu cobertura.'
-                        : '${_nearbyJobs.length} oportunidades · radio ${_serviceRadiusKm.toInt()} km',
+                    '${_nearbyJobs.length} oportunidades · radio ${_serviceRadiusKm.toInt()} km',
                     style: const TextStyle(
                       color: AppTheme.slate500,
                       fontSize: 12,
@@ -1019,15 +1043,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ],
         ],
       ),
-    );
-  }
-
-  Widget _buildOfflineRadar() {
-    return const _InfoCard(
-      icon: Icons.location_off_rounded,
-      title: 'Radar desconectado',
-      message:
-          'Activa tu disponibilidad para recibir nuevas oportunidades. Tus servicios ya aceptados permanecen accesibles.',
     );
   }
 
