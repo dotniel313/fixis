@@ -13,9 +13,9 @@ Ultima actualizacion: 2026-09-28
 
 | Area | Estado | Evidencia |
 |---|---|---|
-| Flutter Analyze | PASS | CI 36369387263 aprobo flutter analyze con el calculo de reconocimientos y pruebas automatizadas; importacion sin uso de registro corregida |
-| Flutter Test | PENDING | CI 36369387263 ejecuto con exito pruebas automatizadas de límites de fidelizacion (0, 2, 3, 9, 10 y 11 pagos); faltan pruebas de flujos críticos de autenticacion y finanzas |
-| Android Debug Build | PASS | CI 36369387263 genero iconos, analizo, ejecuto pruebas y compilo APK debug con .env de prueba; compilacion release y QA fisico siguen pendientes |
+| Flutter Analyze | PASS | CI 36498709482 aprobo flutter analyze en la rama actual. |
+| Flutter Test | PENDING | CI 36498709482 aprobo 7 pruebas: limites de fidelizacion, pertenencia de decision de acceso a la sesion y referencia obligatoria de liquidacion con transporte HTTP simulado. Faltan pruebas de integracion de autenticacion y finanzas contra backend de ensayo. |
+| Android Debug Build | PASS | CI 36498709482 genero iconos, analizo, ejecuto pruebas y compilo APK debug con configuracion simulada. El APK release firmado y su QA fisico se registran por separado. |
 | Icono FIXIS iOS y logo login | PASS | 2026-09-27: captura de Biblioteca de apps en iPhone muestra icono azul con llave blanca FIXIS instalado; captura anterior confirmo el mismo simbolo en login. Se verificaron assets iOS versionados, evitando que git pull restablezca el icono Flutter |
 | Icono FIXIS Android | PASS | 2026-09-27: captura de dispositivo Android confirma llave blanca sobre fondo azul en el launcher. El nombre visible FIXIS se ajusto despues de esta captura; comprobar al instalar la siguiente compilacion |
 | Favicon del sitio publico FIXIS | PASS | 2026-09-27: captura de Safari en fixis.geotactics.com.ec muestra favicon de llave blanca sobre fondo azul y titulo FIXIS |
